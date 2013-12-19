@@ -1,0 +1,67 @@
+
+body, html {
+	width: 100%;
+	height: 100%;
+	background: #001;
+}
+
+#content {
+	width: 80%;
+	margin: auto;
+}
+
+#content p {
+	color: #556;
+	font-size: 1.25rem;
+	text-shadow: 0 1px 1px #000;
+}
+
+	#content p code {
+		color: #999;
+	}
+
+a, a:hover {
+	color: #aaa;
+	text-shadow: 0 1px 1px #000;
+}
+
+#content pre {
+	margin: 50px;
+	line-height: 1.5;
+}
+
+	#content pre code {
+		font-weight: normal;
+	}
+
+#content h2 {
+	color: #999;
+	margin-top: 100px;
+}
+	
+	#content h2:first-child {
+		margin-top: 0;
+		padding-top: 0;
+	}
+
+#content h3 {
+	color: #999;
+	margin-bottom: 0;
+}
+
+/* Small screens (phones) */
+@media only screen and (max-width: 40em) {
+	#content {
+		width: auto;
+		margin: 0 15px;
+	}
+	#content p {
+		margin-left: 10px;
+		margin-right: 10px;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	#content pre {
+		margin: 15px 10px;
+	}
+}

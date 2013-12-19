@@ -1,0 +1,141 @@
+
+body, html {
+	width: 100%;
+	height: 100%;
+	background: #001;
+}
+
+#content {
+	width: 80%;
+	margin: auto;
+}
+
+#content p {
+	color: #556;
+	font-size: 1.25rem;
+	text-shadow: 0 1px 1px #000;
+}
+
+	#content p code {
+		color: #999;
+	}
+
+a, a:hover {
+	color: #aaa;
+	text-shadow: 0 1px 1px #000;
+}
+
+#content pre {
+	margin: 50px;
+	line-height: 1.5;
+}
+
+	#content pre code {
+		font-weight: normal;
+	}
+
+#content h2 {
+	color: #999;
+	margin-top: 100px;
+}
+	
+	#content h2:first-child {
+		margin-top: 0;
+		padding-top: 0;
+	}
+
+#content h3 {
+	color: #999;
+	margin-bottom: 0;
+}
+
+/* Small screens (phones) */
+@media only screen and (max-width: 40em) {
+	#content {
+		width: auto;
+		margin: 0 15px;
+	}
+	#content p {
+		margin-left: 10px;
+		margin-right: 10px;
+		padding-left: 0;
+		padding-right: 0;
+	}
+	#content pre {
+		margin: 15px 10px;
+	}
+}
+
+
+#footer {
+	padding: 200px 50px 25px;
+}
+	
+	#footer p {
+		margin: 0;
+		padding: 0;
+		color: #334;
+		font-size: 0.85rem;
+		line-height: 1.2;
+	}
+
+@media only screen and (max-width: 40em) {
+	#footer {
+		padding: 10px;
+	}
+}
+
+
+#header {
+	padding: 75px 0 150px;
+	background: #000011;
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzIyMjIzMyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMTEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: linear-gradient(to bottom, rgba(51,68,85,1) 0%, rgba(0,0,0,0) 100%);
+}
+
+	#header header {
+		margin: 0;
+		padding: 0;
+		text-align: center;
+	}
+
+		#header h1 {
+			margin: 0;
+			padding: 15px;
+			font-size: 5rem;
+			color: inherit;
+			text-shadow: 0 2px 1px #000;
+		}
+
+			#header h1 a {
+				color: #fff;
+			}
+
+		#header p {
+			color: #999;
+			font-size: 2rem;
+			font-family: DistrictThin;
+		}
+
+	#header nav {
+		font-size: 1.5rem;
+		text-align: center;
+	}
+
+		#header nav a {
+			margin: 0 15px;
+			color: #334;
+			transition: color linear 0.25s;
+			text-shadow: 0 1px 1px #000;
+		}
+	
+			#header nav a:hover {
+				color: #99a;
+			}
+
+@media only screen and (max-width: 40em) {
+	#header {
+		padding: 0 0 50px;
+	}
+}
+
