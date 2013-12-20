@@ -2,7 +2,7 @@
 var fs        = require('fs');
 var commonjs  = require('common.js');
 
-var publicPath = '.';
+var publicPath = './public';
 var buildPath = publicPath + '/build';
 
 module.exports = function(grunt) {
