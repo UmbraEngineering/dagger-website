@@ -1,10 +1,69 @@
 <h2>Install</h2>
 <p>
-	Dagger.js is in the NPM registry, so just call to NPM and it will install it for you.
+	Dagger has a CLI scaffolding tool to help you create and build your projects which can be found in
+	the NPM repository.
 </p>
 
 {{#highlight "bash"}}
-$ npm install [--save] dagger.js
+$ npm install -g dagger-cli
 {{/highlight}}
+
+<p>
+	If you don't want to use the scaffolding tool, you can also install Dagger directly:
+</p>
+
+{{#highlight "bash"}}
+$ npm install --save dagger.js
+{{/highlight}}
+
+<h3>Using The Scaffolding Tool</h3>
+<p>
+	Using the scaffolding tool is very easy and straight-forward. To begin with, you will need a directory to
+	work in.
+</p>
+
+{{#highlight "bash"}}
+$ mkdir my-project
+$ cd my-project
+{{/highlight}}
+
+<p>
+	From here, we can use the scaffold to initialize all of the basics of a Dagger application.
+</p>
+
+{{#highlight "bash"}}
+$ dagger init --deps
+{{/highlight}}
+
+<p>
+	The <code>init</code> command tells the tool to create all the basic directories and files needed for
+	a Dagger application, such as the <code>package.json</code> file, the main <code>app.js</code> file,
+	and the <code>models</code> and <code>endpoints</code> directories. Adding the <code>--deps</code>
+	flag tells it to also call to npm to install the project dependencies. Now we can create our first endpoint.
+</p>
+
+{{#highlight "bash"}}
+$ dagger create endpoint hello
+{{/highlight}}
+
+<p>
+	This will create a new file <code>endpoints/hello.js</code> with a shell endpoint class that will look
+	something like this:
+</p>
+
+{{#highlight "javascript"}}
+
+{{/highlight}}
+
+
+
+
+
+
+
+
+
+
+
 
 

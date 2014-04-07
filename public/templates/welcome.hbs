@@ -13,35 +13,67 @@
 </p>
 
 {{#highlight "javascript"}}
-var Model = require('dagger.js').require('model');
+var models = require('dagger.js/lib/models');
 
-// Define a new Person model
-var Person = module.exports = Model.create('Person', {
-	
-	route: 'people',
+var Email     = models.types.Email;
+var ObjectId  = models.types.ObjectId;
 
-	schema: {
-		name: String,
-		email: {type: Model.Types.Email, index: {unique: true}},
-		gender: {type: String, enum: ['Male', 'Female', 'Other', 'Undisclosed']},
-		children: [{type: Model.Types.ObjectId, ref: 'Person'}]
+//
+// Define a new Person schema
+//
+var PersonSchema = module.exports = {
+	name: String,
+	email: {type: Email, index: {unique: true}},
+	gender: {type: String, enum: ['male', 'female', 'other', 'undisclosed']},
+	children: [{type: ObjectId, ref: 'person'}]
+};
+{{/highlight}}
+
+
+
+<h2>Easy-to-use Endpoints</h2>
+<p>
+	The built-in endpoint class is very easy to use.
+</p>
+
+{{#highlight "javascript"}}
+var Endpoint = require('dagger.js/lib/endpoint');
+
+//
+// Define the new endpoint
+//
+var PeopleEndpoint = module.exports = Endpoint.create({
+
+	route: '/people',
+
+	'get': function(req) {
+		req.respond(200, 'Hello World!');
+	},
+
+	'get /:id': function(req) {
+		req.respond(200, You attempted to fetch ' + req.params.id);
+	},
+
+	'post': function(req) {
+		req.respond(405, 'We don't support POSTs on this endpoint');
+	},
+
+	'put|patch': function(req) {
+		req.respond(200, 'We handle PUT and PATCH requests with the same code');
+	},
+
+	'del': function(req) {
+		req.respond(200, 'No! D: Don't delete me! :(');
 	}
 
 });
 {{/highlight}}
 
-
-
-<h2>Auto-Generated Endpoints</h2>
-<p>
-	Dagger.js automatically creates REST endpoints for your models, so you don't have to. These
-	endpoints come with all of the basics expected of a REST API, as well as a few extras like
-	<code>/model/schema</code> endpoints that describe the model schema, built-in <code>filter</code>
-	and <code>populate</code> query params, and bulk <code>PUT</code>, <code>PATCH</code>, and
-	<code>DELETE</code> operations.
-</p>
-
 <h3>Schema Endpoints</h3>
+<p>
+	Auto-generated endpoints will automatically create schema endpoints for you models so your API will
+	document itself.
+</p>
 
 {{#highlight "http"}}
 GET http://example.com/people/schema HTTP/1.1
@@ -75,6 +107,10 @@ Content-Type: application/json
 {{/highlight}}
 
 <h3>Filters and Populates</h3>
+<p>
+	You can pass in mongodb style filter queries to your model endpoints, as well as specifying fields to
+	be populated when querying.
+</p>
 
 {{#highlight "http"}}
 GET http://example.com/people?filter={"gender":"Male"}&amp;populate=children HTTP/1.1
@@ -100,6 +136,9 @@ Content-Type: application/json
 {{/highlight}}
 
 <h3>Bulk Updates and Deletes</h3>
+<p>
+	Model endpoints also support bulk updates and deletes so you can design you code to be more efficient.
+</p>
 
 {{#highlight "http"}}
 PATCH http://example.com/people HTTP/1.1
@@ -139,58 +178,26 @@ Content-Type: application/json
 </p>
 
 {{#highlight "javascript"}}
-// Using the socket.io client to make requests
 var socket = io.connect('http://example.com');
-socket.emit('get', {url: '/people?filter={"name":"Bob"}'}, function(res) {
+
+// Using the socket.io client to make requests
+socket.emit('request', {method: 'get', url: '/people?filter={"name":"Bob"}'}, function(res) {
 	var bob = res.body;
 });
 {{/highlight}}
 
-
-
-<h2>Built-in Authentication and Authorization System</h2>
 <p>
-	Token based authentication comes built-in using the supplied <code>AuthToken</code> model and
-	<code>/auth-tokens</code> endpoint. Users authenticate by sending a <code>POST</code> request to
-	<code>/auth-tokens</code> with their authentication credentials.
+	You can also use Socket.IO to create push-based applications in Dagger.js by having the client listen
+	for events on specific models:
 </p>
 
-{{#highlight "http"}}
-POST http://example.com/auth-tokens HTTP/1.1
-Content-Type: application/json
+{{#highlight "javascript"}}
+var socket = io.connect('http://example.com');
 
-{
-	"username": "bob",
-	"password": "bobsSecretPassword"
-}
+// Using socket.io client to listen for events on the server
+socket.emit('listen', {model: 'person', event: 'create', filter: {gender: 'female'}}, function(res) {
+	socket.on(res.emits, function(person) {
+		console.log('A new person with gender "female" was created on the server.');
+	});
+});
 {{/highlight}}
-
-<p>
-	The user then gets back an auth token.
-</p>
-
-{{#highlight "http"}}
-HTTP/1.1 201 CREATED
-Content-Type: application/json
-
-{
-	"token": "...",
-	"user": "...",
-	"expires": 1387432837389
-}
-{{/highlight}}
-
-<p>
-	This auth token can now be used to authenticate future requests by sending it in an
-	<code>Auth-Token</code> header.
-</p>
-
-{{#highlight "http"}}
-GET http://example.com/people HTTP/1.1
-Auth-Token: ...
-{{/highlight}}
-
-<p>
-	Dagger.js also has built-in models for handling roles and permissions so that you can build
-	permission based authorization into your API.
-</p>
