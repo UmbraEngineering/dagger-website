@@ -2,16 +2,16 @@
 var $               = require('jquery');
 var cloak           = require('cloak');
 var Router          = require('cloak/router');
+var IntroView       = require('views/intro');
 var HeaderView      = require('views/header');
 var FooterView      = require('views/footer');
-var WelcomeView     = require('views/welcome');
 var GetStartedView  = require('views/get-started');
 
 var MainRouter = module.exports = Router.extend({
 
 	routes: {
-		'/':             'welcome',
-		'/welcome':      'welcome',
+		'/':             'intro',
+		'/intro':        'intro',
 		'/get-started':  'getStarted',
 		'/example':      'example',
 		'/docs':         'docs'
@@ -35,10 +35,10 @@ var MainRouter = module.exports = Router.extend({
 // --------------------------------------------------------
 	
 	// 
-	// "/" and "/welcome"
+	// "/" and "/intro"
 	// 
-	welcome: function() {
-		this.drawViewToContent(new WelcomeView());
+	intro: function() {
+		this.drawViewToContent(new IntroView());
 	},
 
 // --------------------------------------------------------

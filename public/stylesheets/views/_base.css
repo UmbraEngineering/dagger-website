@@ -49,6 +49,12 @@ a, a:hover {
 	margin-bottom: 0;
 }
 
+#content abbr {
+	color: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+}
+
 /* Small screens (phones) */
 @media only screen and (max-width: 40em) {
 	#content {
@@ -63,5 +69,19 @@ a, a:hover {
 	}
 	#content pre {
 		margin: 15px 10px;
+	}
+}
+
+/* Large screens (1920px-ish) */
+@media only screen and (min-width:90.063em) {
+	html, body {
+		font-size: 115%;
+	}
+}
+
+/* Really massive screens */
+@media only screen and (min-width:120.063em) {
+	html, body {
+		font-size: 125%;
 	}
 }

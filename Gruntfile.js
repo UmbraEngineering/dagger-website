@@ -104,13 +104,6 @@ module.exports = function(grunt) {
 				options: {
 					banner: '/*! Todo Demo App - JavaScript app file */'
 				}
-			},
-			templates: {
-				src: buildPath + '/js/templates.js',
-				dest: buildPath + '/js/templates.min.js',
-				options: {
-					banner: '/*! Todo Demo App - Pre-compiled handlebars template file */'
-				}
 			}
 		},
 
@@ -136,7 +129,7 @@ module.exports = function(grunt) {
 					node: true,
 					namespace: 'exports',
 					processName: function(filename) {
-						return filename.replace(/\.hbs$/, '').split('/').slice(2).join('.');
+						return filename.replace(/\.hbs$/, '').split('/').slice(3).join('.');
 					}
 				}
 			}

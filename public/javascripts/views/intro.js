@@ -4,10 +4,10 @@ var View       = require('cloak/view');
 
 require('./_highlight');
 
-var WelcomeView = module.exports = View.extend({
+var IntroView = module.exports = View.extend({
 
-	className: 'welcome',
-	template: templates['welcome'],
+	className: 'intro',
+	template: templates['intro'],
 
 	events: {
 		// 

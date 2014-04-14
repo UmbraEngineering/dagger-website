@@ -4316,6 +4316,12 @@ a:hover {
   margin-bottom: 0;
 }
 
+#content abbr {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
 /* Small screens (phones) */
 
 @media only screen and (max-width: 40em) {
@@ -4333,6 +4339,24 @@ a:hover {
 
   #content pre {
     margin: 15px 10px;
+  }
+}
+
+/* Large screens (1920px-ish) */
+
+@media only screen and (min-width:90.063em) {
+  html,
+  body {
+    font-size: 115%;
+  }
+}
+
+/* Really massive screens */
+
+@media only screen and (min-width:120.063em) {
+  html,
+  body {
+    font-size: 125%;
   }
 }
 
@@ -4355,7 +4379,7 @@ a:hover {
 }
 
 #header {
-  padding: 75px 0 150px;
+  padding: 75px 0 350px;
   background: #000011;
   background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzIyMjIzMyIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMwMDAwMTEiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
   background: -webkit-gradient(linear, left top, left bottom, from(rgba(51,68,85,1)), to(rgba(0,0,0,0)));
