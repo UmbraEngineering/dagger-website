@@ -1,5 +1,5 @@
-;require._modules["/lib/spin.js"] = (function() { var __filename = "/lib/spin.js"; var __dirname = "/lib"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /lib/spin.js  == */ var __module__ = function() { 
+;require._modules["/vendor/spin.js"] = (function() { var __filename = "/vendor/spin.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/spin.js  == */ var __module__ = function() { 
  //fgnass.github.com/spin.js#v1.3.2
 
 /**
@@ -355,4 +355,4 @@
   return Spinner
 
 })); 
- }; /* ==  End source for module /lib/spin.js  == */ return module; }());;
+ }; /* ==  End source for module /vendor/spin.js  == */ return module; }());;

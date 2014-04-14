@@ -1,5 +1,5 @@
-;require._modules["/lib/prism/prism.js"] = (function() { var __filename = "/lib/prism/prism.js"; var __dirname = "/lib/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /lib/prism/prism.js  == */ var __module__ = function() { 
+;require._modules["/vendor/prism/prism.js"] = (function() { var __filename = "/vendor/prism/prism.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/prism/prism.js  == */ var __module__ = function() { 
  
 
 /* **********************************************
@@ -558,4 +558,4 @@ Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(f
 });
 
 })(); 
- }; /* ==  End source for module /lib/prism/prism.js  == */ return module; }());;
+ }; /* ==  End source for module /vendor/prism/prism.js  == */ return module; }());;

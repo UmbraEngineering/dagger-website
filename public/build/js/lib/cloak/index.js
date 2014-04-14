@@ -1,7 +1,7 @@
 ;require._modules["/lib/cloak/index.js"] = (function() { var __filename = "/lib/cloak/index.js"; var __dirname = "/lib/cloak"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
  /* ==  Begin source for module /lib/cloak/index.js  == */ var __module__ = function() { 
  /**
- * Cloak Framework Core - v1.0.0
+ * Cloak Framework Core - v1.2.0
  *
  * Author: James Brumond
  * Copyright 2013 Umbra Engineering
@@ -9,10 +9,9 @@
  */
 
 /*jshint browser: true, bitwise: false, camelcase: false, eqnull: true, latedef: false,
-  plusplus: false, jquery: true, shadow: true, smarttabs: true, loopfunc: true, boss: true,
-  unused: false */
+  plusplus: false, shadow: true, smarttabs: true, loopfunc: true, boss: true, unused: false */
 
-/*global Class: true, EventEmitter2: true, _: true, Handlebars: true, console: true */
+/*global console: true */
 
 var $ = require('jquery');
 var _ = require('cloak/underscore');
@@ -29,7 +28,7 @@ if (! window.console.log) {window.console.log = function () { };}
 exports.config = {
 	// EventEmitter2 configuration for all AppObjects
 	ee2: {
-		wildcard: false,
+		wildcard: true,
 		delimiter: '.',
 		newListener: false,
 		maxListeners: 20
@@ -40,7 +39,7 @@ exports.config = {
 
 	// The property name used for passing model ids to and from
 	// the server
-	idKey: 'id',
+	idKey: '_id',
 
 	// Should repsonse data be loaded into the model after a save call?
 	loadSaveResponses: true,
@@ -51,29 +50,26 @@ exports.config = {
 	// Should delegate events be used by default?
 	delegateEvents: true,
 
+	// Should events be inherited from parent views to child views?
+	inheritEvents: false,
+
 	// Should absolute URLs (not relative to apiUrl) be allowed?
 	allowAbsoluteUrls: false,
 
 	// Socket.io socket, if sockets are to be used
 	socket: null,
 
-	// How should bulk operations be performed (either "standard", "dagger", or "custom")
-	bulkOperations: 'standard',
-
-	// Maximum number of XHR/Socket requests allowed to be made at one time
-	maxRequests: 1,
+	// The model store type to use
+	modelStore: null,
 
 	// Should models be removed from collections automatically when deleted?
 	removeFromCollectionOnDelete: true
 };
 
 // 
-// Authentication info is stored here
+// Define the default model store
 // 
-exports.auth = {
-	token: false,
-	httpAuth: false  // {user, pass}
-};
+exports.config.modelStore = require('cloak/model-stores/xhr');
 
 // 
 // Store references to these object for easy access
@@ -128,6 +124,6 @@ exports.idObj = function(id) {
 		delete obj[key];
 	}
 	return obj;
-}
+};
  
  }; /* ==  End source for module /lib/cloak/index.js  == */ return module; }());;

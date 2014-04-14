@@ -11,7 +11,7 @@ var nextId = 1;
 // 
 // AppObject class
 // 
-var AppObject = module.exports = Class.extend({
+var AppObject = module.exports = Class.extend(EventEmitter, {
 	
 	init: function() {
 		// Inherit from EventEmitter
@@ -30,19 +30,6 @@ var AppObject = module.exports = Class.extend({
 		for (var i = 0, c = arguments.length; i < c; i++) {
 			this[arguments[i]] = _.bind(this[arguments[i]], this);
 		}
-	},
-
-	// 
-	// Check if this object inherits from a given parent class
-	// 
-	inherits: function(Parent) {
-		var Scope = this.constructor;
-		do {
-			if (Scope === Parent) {return true;}
-			if (Scope === Object) {return false;}
-		}
-		// Work our way up the prototype chain...
-		while (Scope = Scope.prototype.constructor);
 	},
 
 	// 
@@ -77,8 +64,5 @@ var AppObject = module.exports = Class.extend({
 	}
 
 });
-
-// Inherit the EventEmitter prototype
-_.extend(AppObject.prototype, EventEmitter.prototype);
  
  }; /* ==  End source for module /lib/cloak/app-object.js  == */ return module; }());;

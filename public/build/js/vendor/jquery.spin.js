@@ -1,5 +1,5 @@
-;require._modules["/lib/jquery.spin.js"] = (function() { var __filename = "/lib/jquery.spin.js"; var __dirname = "/lib"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /lib/jquery.spin.js  == */ var __module__ = function() { 
+;require._modules["/vendor/jquery.spin.js"] = (function() { var __filename = "/vendor/jquery.spin.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/jquery.spin.js  == */ var __module__ = function() { 
  /**
  * Copyright (c) 2011-2013 Felix Gnass
  * Licensed under the MIT license
@@ -80,4 +80,4 @@ $('#el').spin('flower', 'red');
   }
 
 })); 
- }; /* ==  End source for module /lib/jquery.spin.js  == */ return module; }());;
+ }; /* ==  End source for module /vendor/jquery.spin.js  == */ return module; }());;

@@ -35,6 +35,9 @@ var View = module.exports = AppObject.extend({
 			this.$elem.attr(this.attributes);
 		}
 
+		// We store all currently bound events here so we can unbind them later
+		this._boundEvents = [ ];
+
 		// Call any defined initialize method
 		if (typeof this.initialize === 'function') {
 			this.initialize.apply(this, arguments);
@@ -60,14 +63,13 @@ var View = module.exports = AppObject.extend({
 	//
 	render: function(data, templateProperty) {
 		data = _.extend({ _uuid: this._uuid }, data || { });
-
-		this.emit('render', data);
-
 		templateProperty = templateProperty || 'template';
+
+		this.emit('render', data, templateProperty);
 
 		// If the template has not been used yet, compile it
 		if (typeof this[templateProperty] === 'string') {
-			this[templateProperty] = handlebars.compile(this[templateProperty]);
+			this[templateProperty] = require('handlebars/compiler').compile(this[templateProperty]);
 		}
 		
 		// Render the compiled template
@@ -95,14 +97,14 @@ var View = module.exports = AppObject.extend({
 	//
 	bindEvents: function(events) {
 		events = _.extend({ }, events || this.events);
-
+		
 		if (events) {
+			// Determine if we should bind by delegate
 			var delegate = events._delegate;
 			if (typeof delegate !== 'boolean') {
 				delegate = cloak.config.delegateEvents;
 			}
 
-			delete events._extends;
 			delete events._delegate;
 
 			_.forEach(events, _.bind(this._bindEvent, this, delegate));
@@ -115,10 +117,12 @@ var View = module.exports = AppObject.extend({
 	// Parses an event string for event data, eg.
 	//
 	//   keystroke{combo:ctrl+s}
+	//   keystroke{ctrl+s}
 	//
 	// Becomes:
 	//
 	//   .on("keystroke", {"combo":"ctrl+s"}, ...)
+	//   .on("keystroke", "ctrl+s", ...)
 	//
 	_eventDataRegex: /\{([^}]+)\}$/,
 
@@ -135,51 +139,67 @@ var View = module.exports = AppObject.extend({
 		query = query.join(' ');
 
 		args = func.split(' ');
-		args.splice(0, 1, this[args[0]], this);
-		if (typeof args[0] !== 'function') {
+		func = this[args[0]];
+		args = args.slice(1);
+
+		if (typeof func !== 'function') {
 			throw new Error('Cannot bind a undefined function to a DOM event.');
 		}
-		func = _.bind.apply(_, args);
+
+		var scope = this;
+		var bound = function(evt) {
+			return func.apply(scope, [evt].concat(args));
+		};
 
 		// Parse event data out of the event name
 		var data = this._eventDataRegex.exec(event);
 		if (data) {
 			event = event.replace(data[0], '');
 			data = data[1].split(',');
-			
-			var temp = { };
-			_.forEach(data, function(item) {
-				item = item.split(':');
-				temp[item[0]] = item[1];
-			});
-			data = temp;
+
+			if (! data[0] || data[0].indexOf(':') >= 0) {
+				var temp = { };
+				_.forEach(data, function(item) {
+					item = item.split(':');
+					temp[item[0]] = item[1];
+				});
+				data = temp;
+			}
 		}
 
 		// Namespace the event so we can easily unbind later
 		event += '._viewEvents.' + this._uuid;
 
+		// Store a reference to this event for later unbinding
+		this._boundEvents.push({
+			query: query,
+			event: event,
+			delegate: delegate
+		});
+
 		// Bind directly to this.$elem
 		if (query === '@') {
 			this.$elem.off(event);
-			this.$elem.on(event, data, func);
+			this.$elem.on(event, data, bound);
 		}
 
 		// Bind to the document
 		else if (query === '') {
-			app.$doc.off(event);
-			app.$doc.on(event, data, func);
+			cloak.$doc.off(event);
+			cloak.$doc.on(event, data, bound);
 		}
 
 		// Bind using a delegate
 		else if (delegate) {
 			this.$elem.off(event, query);
-			this.$elem.on(event, query, data, func);
+			this.$elem.on(event, query, data, bound);
 		}
 
 		// Bind directly with a query
 		else {
-			this.$(query).off(event);
-			this.$(query).on(event, data, func);
+			var $elem = this.$(query);
+			$elem.off(event);
+			$elem.on(event, data, bound);
 		}
 	},
 
@@ -187,8 +207,12 @@ var View = module.exports = AppObject.extend({
 	// Removes event functions bound above
 	//
 	unbindEvents: function(events) {
-		_.forEach(events || _.keys(this.events),
-			_.bind(this._unbindEvent, this, this.events._delegate));
+		if (! events) {
+			events = this._boundEvents;
+			this._boundEvents = [ ];
+		}
+
+		_.forEach(events, _.bind(this._unbindEvent, this));
 	},
 
 	//
@@ -196,43 +220,60 @@ var View = module.exports = AppObject.extend({
 	//
 	// Unbinds a single event from the events object
 	//
-	_unbindEvent: function(delegate, query) {
-		var event;
-
-		query = query.split(' ');
-		event = query.shift();
-		query = query.join(' ');
-
-		// Parse event data out of the event name
-		var data = this._eventDataRegex.exec(event);
-		if (data) {
-			event = event.replace(data[0], '');
-		}
-
-		// Namespace the event so we can easily unbind later
-		event += '._viewEvents.' + this._uuid;
-
+	_unbindEvent: function(event) {
 		// Bound directly to this.$elem
-		if (query === '@') {
-			this.$elem.off(event);
+		if (event.query === '@') {
+			this.$elem.off(event.event);
 		}
 
 		// Bound to the document
-		else if (query === '') {
-			app.$doc.off(event);
+		else if (event.query === '') {
+			cloak.$doc.off(event.event);
 		}
 
 		// Bound using a delegate
-		else if (delegate) {
-			this.$elem.off(event, query);
+		else if (event.delegate) {
+			this.$elem.off(event.event, event.query);
 		}
 
 		// Bound directly with a query
 		else {
-			this.$(query).off(event);
+			this.$(event.query).off(event.event);
+		}
+	},
+
+	// 
+	// Removes the view instance, pulling the content from the DOM and unbinding
+	// all event listeners
+	// 
+	remove: function() {
+		this.emit('remove');
+		this.$elem.remove();
+		if (this.events) {
+			this.unbindEvents();
 		}
 	}
 
 });
+
+// 
+// We handle event inheritence here in the extension stage
+// 
+View.onExtend = function() {
+	this.onExtend = View.onExtend;
+
+	// Inherit events from parent classes
+	if (cloak.config.inheritEvents) {
+		var Scope = this;
+		var events = { };
+
+		while (Scope !== View) {
+			events = _.extend({ }, Scope.prototype.events || { }, events);
+			Scope = Scope._parent;
+		}
+
+		this.prototype.events = events;
+	}
+};
  
  }; /* ==  End source for module /lib/cloak/view.js  == */ return module; }());;

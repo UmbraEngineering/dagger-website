@@ -1,5 +1,5 @@
-;require._modules["/lib/cookies.js"] = (function() { var __filename = "/lib/cookies.js"; var __dirname = "/lib"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /lib/cookies.js  == */ var __module__ = function() { 
+;require._modules["/vendor/cookies.js"] = (function() { var __filename = "/vendor/cookies.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/cookies.js  == */ var __module__ = function() { 
  /*!
  * Cookies.js - 0.3.1
  * Wednesday, April 24 2013 @ 2:28 AM EST
@@ -141,4 +141,4 @@
         window.Cookies = Cookies;
     }
 })(); 
- }; /* ==  End source for module /lib/cookies.js  == */ return module; }());;
+ }; /* ==  End source for module /vendor/cookies.js  == */ return module; }());;

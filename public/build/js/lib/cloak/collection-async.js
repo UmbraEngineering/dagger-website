@@ -9,7 +9,7 @@ var _      = require('cloak/underscore');
 var CollectionAsync = module.exports = Class.extend({
 
 	init: function(collection) {
-		this.collection = colllection;
+		this.collection = collection;
 	},
 
 // --------------------------------------------------------
@@ -50,7 +50,7 @@ var CollectionAsync = module.exports = Class.extend({
 	// @alias Async::detectSeries
 	// 
 	findSeries: function(func) {
-		return this.detectRight(func);
+		return this.detectSeries(func);
 	}
 
 });
@@ -90,7 +90,7 @@ _.each(asyncMethods, function(method) {
 		async[method].apply(async, args);
 
 		return deferred.promise();
-	}
+	};
 });
  
  }; /* ==  End source for module /lib/cloak/collection-async.js  == */ return module; }());;

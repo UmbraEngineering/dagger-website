@@ -11,13 +11,22 @@
 // Modified for use in Cloak.js by James Brumond
 // 
 
-var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
+var _ = require('cloak/underscore');
+
+var initializing = false;
+
+/*jshint ignore:start */
+var fnTest = /xyz/.test(function() { xyz; }) ? /\b_super\b/ : /.*/;
+/*jshint ignore:end */
 
 // The base Class implementation (does nothing)
 var Class = module.exports = function(){};
 
 // Here we allow setting of a callback to run whenever this model is extended
 Class.onExtend = null;
+
+// Add this just to help with inheritence chaining, in case anyone cares
+Class._parent = Object;
 
 // This function just passes the first param to the constructor. This is limited
 // in the sense that the default only allows one param, but anything needing more
@@ -29,6 +38,16 @@ Class.create = function(param) {
 // Create a new Class that inherits from this class
 Class.extend = function(prop) {
 	var _super = this.prototype;
+
+	// If more than one property object is given, merge them before running
+	// (pseudo-support for mixins)
+	if (arguments.length > 1) {
+		var args = _.map(_.toArray(arguments), function(mixin) {
+			return (typeof mixin === 'function') ? mixin.prototype : mixin;
+		});
+		args.unshift({ });
+		prop = _.extend.apply(_, args);
+	}
  
 	// Instantiate a base class (but only create the instance,
 	// don't run the init constructor)
@@ -37,6 +56,7 @@ Class.extend = function(prop) {
 	initializing = false;
  
 	// Copy the properties over onto the new prototype
+	/*jshint loopfunc:true */
 	for (var name in prop) {
 		// Check if we're overwriting an existing function
 		prototype[name] = typeof prop[name] == "function" &&
@@ -63,8 +83,9 @@ Class.extend = function(prop) {
 	// The dummy class constructor
 	function Class() {
 		// All construction is actually done in the init method
-		if ( !initializing && this.init )
+		if (! initializing && this.init) {
 			this.init.apply(this, arguments);
+		}
 	}
  
 	// Populate our constructed prototype object
@@ -73,11 +94,25 @@ Class.extend = function(prop) {
 	// Enforce the constructor to be what we expect
 	Class.prototype.constructor = Class;
 
+	// Expose the parent class
+	Class._parent = this;
+
 	// And make this class extendable
 	Class.extend = arguments.callee;
 
 	// Add the create method to this class
 	Class.create = this.create;
+
+	// This method tests if the class extends another given class
+	Class.inherits = function(Parent) {
+		var Scope = this;
+		do {
+			if (Scope === Parent) {return true;}
+			if (Scope === Object) {return false;}
+		}
+		// Work our way up the scope
+		while (Scope = Scope._parent);
+	};
 
 	// If this class has an onExtend method, call it now with the completed class
 	if (typeof this.onExtend === 'function') {

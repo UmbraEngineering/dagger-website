@@ -1,18 +1,30 @@
 
 var cloak       = require('cloak');
-var xhr         = require('cloak/xhr');
 var AppObject   = require('cloak/app-object');
 var Collection  = require('cloak/collection');
 var _           = require('cloak/underscore');
 var $           = require('jquery');
 
 // 
+// Load the default model store to inherit into the model class
+// 
+// We allow this to be blank, in which case no model store will be loaded.
+// 
+var modelStore = cloak.config.modelStore;
+
+// 
 // Model class
 // 
-var Model = module.exports = AppObject.extend({
+var Model = module.exports = AppObject.extend(modelStore.methods, {
+
+	url: null,
+	name: null,
 
 	init: function() {
 		this._super();
+
+		// If not given a name for the model, infer one from the url
+		this.name = this.name || this.url.split('/')[1].replace(/\{$/, '');
 
 		// Build the new attributes object
 		this.attributes = this._buildAttributes();
@@ -52,6 +64,8 @@ var Model = module.exports = AppObject.extend({
 	// Takes the values from this.attributes and builds a new attributes object
 	// for this instance.
 	// 
+	// @return object
+	// 
 	_buildAttributes: function() {
 		var attrs = { };
 		var scope = this.constructor;
@@ -69,7 +83,7 @@ var Model = module.exports = AppObject.extend({
 			}
 		}
 		// Work our way up the prototype chain..
-		while (scope = scope.prototype.constructor && scope !== Model);
+		while ((scope = scope._parent) && scope !== Model);
 
 		// Process the constructed attributes object for Models and Collections
 		_.each(_.keys(attrs), _.bind(this._initializeModelsAndCollections, this, attrs));
@@ -80,6 +94,10 @@ var Model = module.exports = AppObject.extend({
 	// 
 	// If the given {key} in the given {attrs} hash is a Model or Collection,
 	// replace it with a new instance of itself
+	// 
+	// @param {attrs} the attributes object
+	// @param {key} the attribute key
+	// @return void
 	// 
 	_initializeModelsAndCollections: function(attrs, key) {
 		var value = attrs[key];
@@ -95,10 +113,34 @@ var Model = module.exports = AppObject.extend({
 		}
 	},
 
+	// 
+	// Remove given keys from the changedLocally record
+	// 
+	// @param {keys} optional keys to remove; removes all keys if not given
+	// @return void
+	// 
+	_removeFromChangedLocally: function(keys) {
+		var self = this;
+
+		if (! keys) {
+			return self._changedLocally.length = 0;
+		}
+
+		_.forEach(keys, function(key) {
+			var index = _.indexOf(self._changedLocally, key);
+			if (index >= 0) {
+				self._changedLocally.splice(index, 1);
+			}
+		});
+	},
+
 // --------------------------------------------------------
 	
 	// 
 	// Does this model match the given ID/model
+	// 
+	// @param {id} the id string/model instance to test
+	// @return boolean
 	// 
 	is: function(id) {
 		if (id instanceof Model) {
@@ -150,12 +192,21 @@ var Model = module.exports = AppObject.extend({
 	// 
 	// Returns the ID of the model
 	// 
-	id: function() {
+	// @param {newId} optional new ID to set on the model
+	// @return string
+	// 
+	id: function(newId) {
+		if (newId) {
+			this.attributes[cloak.config.idKey] = newId;
+		}
 		return this.attributes[cloak.config.idKey];
 	},
 	
 	// 
 	// Gets an attribute from the {attributes} hash
+	// 
+	// @param {key} the attribute to get
+	// @return mixed
 	// 
 	get: function(key) {
 		var value = this.attributes[key];
@@ -167,6 +218,10 @@ var Model = module.exports = AppObject.extend({
 
 	// 
 	// Sets an attribute to the {attributes} hash and emits a "change" event
+	// 
+	// @param {key} the attribute to set
+	// @param {value} the value to store in the attribute
+	// @return this
 	// 
 	set: function(key, value) {
 		var old = this.attributes[key];
@@ -183,12 +238,20 @@ var Model = module.exports = AppObject.extend({
 	// 
 	// Define a new getter for the attribute {key}
 	// 
+	// @param {key} the attribute to define the getter for
+	// @param {func} the getter function
+	// @return void
+	// 
 	defineGetter: function(key, func) {
 		this._getters[key] = func;
 	},
 
 	// 
 	// Define a new setter for the attribute {key}
+	// 
+	// @param {key} the attribute to define the setter for
+	// @param {func} the setter function
+	// @return void
 	// 
 	defineSetter: function(key, func) {
 		this._setters[key] = func;
@@ -197,12 +260,18 @@ var Model = module.exports = AppObject.extend({
 	// 
 	// Remove any defined getter for the attribute {key}
 	// 
+	// @param {key} the attribute to remove the getter for
+	// @return void
+	// 
 	removeGetter: function(key) {
 		delete this._getters[key];
 	},
 
 	// 
 	// Remove any defined setter for the attribute {key}
+	// 
+	// @param {key} the attribute to remove the setter for
+	// @return void
 	// 
 	removeSetter: function(key) {
 		delete this._setters[key];
@@ -212,6 +281,9 @@ var Model = module.exports = AppObject.extend({
 	
 	// 
 	// Returns a simple Object structure representing the model and it's children
+	// 
+	// @param {opts} allows setting the "deep" option
+	// @return object
 	// 
 	serialize: function(opts) {
 		var self = this;
@@ -238,18 +310,27 @@ var Model = module.exports = AppObject.extend({
 	// ID key, but this might be overridden to, for example, return a fully
 	// serialized child object.
 	// 
+	// @param {child} the child object
+	// @param {deep} are we doing deep serializing
+	// @return mixed
+	// 
 	serializeChild: function(child, deep) {
-		if (value instanceof Collection) {
+		if (child instanceof Collection) {
 			return child.serialize(deep);
 		}
-		return deep ? child.serialize : child.id();
+		return deep ? child.serialize() : child.id();
 	},
 
 	// 
 	// Take a data object (most likely retrieved from the server) and incorporate
 	// it into the model
 	// 
+	// @param {data} the data object
+	// @return void
+	// 
 	unserialize: function(data) {
+		this.emit('unserialize');
+
 		var attrs = this.attributes;
 		var origAttrs = this.constructor.prototype.attributes;
 		_.each(_.keys(data), function(key) {
@@ -283,12 +364,16 @@ var Model = module.exports = AppObject.extend({
 
 		// Empty out the changes list
 		this._changedLocally.length = 0;
+
+		this.emit('unserialized');
 	},
 
 // --------------------------------------------------------
 
 	// 
 	// Get the URL for this model instance
+	// 
+	// @return string
 	// 
 	urlAttr: /\{([^}]+)\}/,
 	reqUrl: function() {
@@ -331,139 +416,124 @@ var Model = module.exports = AppObject.extend({
 // --------------------------------------------------------
 
 	// 
-	// Perform a GET request and update the loaded data
+	// Load data from the model store and import it into the model
 	// 
-	load: function(query) {
+	// @param {data} optional query string data
+	// @return promise
+	// 
+	load: function(data) {
 		var self = this;
-		var deferred = $.Deferred();
 
-		this.emit('load');
-		
-		xhr.get(this.reqUrl(), query)
-			.on('error', _.bind(deferred.rejectWith, deferred, this))
-			.on('success', function(req) {
-				self.importReqBody(req, deferred);
-			});
+		self.emit('load');
 
-		return deferred.promise();
+		return self._load(data).then(function(res) {
+			if (self.processResponse) {
+				res = self.processResponse(res);
+			}
+
+			self.unserialize(res);
+			self.emit('loaded');
+
+			self._removeFromChangedLocally();
+		});
 	},
 
 	// 
-	// Import the response body from a load request
+	// Save data to the model store
 	// 
-	// @param {req} the req object
-	// @param {deferred} the $.Deferred object to respond to
-	// @return void
-	// 
-	importReqBody: function(req, deferred) {
-		try {
-			this.unserialize(req.json);
-		} catch (err) {
-			return deferred.rejectWith(self, req);
-		}
-
-		this.emit('loaded');
-
-		deferred.resolveWith(this, req);
-	},
-
-// --------------------------------------------------------
-	
-	// 
-	// Saves the model to the server. Selects the request method based on whether
-	// or not the ID property is defined
+	// @return promise
 	// 
 	save: function() {
 		var self = this;
-		var deferred = $.Deferred();
-		var method = this.id() ? 'put' : 'post';
+		var method = (self.id() ? 'put' : 'post');
 
-		this.emit('save', method);
+		self.emit(cloak.event('save.' + method));
 
-		xhr[method](this.reqUrl(), this.serialize())
-			.on('error', _.bind(deferred.rejectWith, deferred, this))
-			.on('success', function(req) {
-				self.emit('saved', method);
+		return self._save(this.serialize()).then(function(res) {
+			self.emit(cloak.event('saved.' + method));
 
-				if (cloak.config.loadSaveResponses) {
-					return self.importReqBody(req, deferred);
-				} else {
-					// Empty out the changes list
-					self._changedLocally.length = 0;
+			// Import the response if needed
+			if (cloak.config.loadSaveResponses) {
+				if (self.processResponse) {
+					res = self.processResponse(res);
 				}
 
-				deferred.resolveWith(self, req);
-			});
+				self.unserialize(res);
+			}
 
-		return deferred.promise();
+			// Empty out the record of modified fields
+			self._removeFromChangedLocally();
+		});
 	},
 
-	//
-	// Selectively saves specific properties back to the server using
-	// a PATCH request
-	//
-	patch: function(arg1) {
-		var self = this;
-		var deferred = $.Deferred();
-		var keys = _.isArray(arg1) ? arg1 : _.toArray(arguments);
-		var data = _.pick.apply(_, [this.serialize()].concat(keys));
-
-		this.emit('patch', keys);
-
-		xhr.patch(this.reqUrl(), data)
-			.on('error', _.bind(deferred.rejectWith, deferred, this))
-			.on('success', function(req) {
-				self.emit('patched', keys);
-
-				if (cloak.config.loadPatchResponses) {
-					return self.importReqBody(req, deferred);
-				} else {
-					// Remove patched items from the changes list
-					_.each(keys, function(key) {
-						var index = _.indexOf(self._changedLocally, key);
-						if (index >= 0) {
-							self._changedLocally.splice(index, 1);
-						}
-					})
-				}
-
-				deferred.resolveWith(self, req);
-			});
-
-		return deferred.promise();
-	},
-
-// --------------------------------------------------------
-	
 	// 
-	// Delete the model from the server using a DELETE request
+	// Patch the model in the model store
+	// 
+	// @param {attrs...} the attributes to be updated
+	// @return promise
+	// 
+	patch: function(attrs) {
+		var self = this;
+
+		// Allow keys to be passed either as an array of as separate arguments
+		var keys = _.isArray(attrs) ? attrs : _.toArray(arguments);
+
+		// Get the limited data object
+		var data = _.pickArray(this.serialize(), keys);
+
+		self.emit('patch', keys);
+
+		return self._patch(data).then(function(res) {
+			self.emit('patched', keys);
+
+			var toRemove = keys;
+
+			// Import the response if needed
+			if (cloak.config.loadPatchResponses) {
+				if (self.processResponse) {
+					res = self.processResponse(res);
+				}
+
+				if (cloak.config.loadPatchResponses === 'only-patched') {
+					res = _.pickArray(res, keys);
+				} else {
+					toRemove = null;
+				}
+
+				self.unserialize(res);
+			}
+
+			// Remove updated values from the _changedLocally record
+			self._removeFromChangedLocally(toRemove);
+		});
+	},
+
+	// 
+	// Delete the model from the model store
+	// 
+	// @return promise
 	// 
 	del: function() {
-		var deferred = $.Deferred();
+		var self = this;
 
-		// Don't allow deleting without an ID to avoid accidental deletion
-		// of entire list routes
-		if (! this.id()) {
-			deferred.rejectWith(this, new Error('Cannot make a DELETE request on a model with no ID'));
+		if (! self.id()) {
+			$.Deferred().reject(new Error('Cannot make a DELETE request on a model with no ID')).promise();
 		}
 
-		// Otherwise, go ahead with the delete, then teardown the model
-		else {
-			this.emit('delete');
-			xhr.del(this.reqUrl())
-				.on('error', _.bind(deferred.rejectWith, deferred, this))
-				.on('success', this.emits('deleted'))
-				.on('success', _.bind(this.destroy, this))
-				.on('success', _.bind(deferred.resolveWith, deferred, this));
-		}
+		self.emit('delete');
 
-		return deferred.promise();
+		return self._del().then(function() {
+			self.emit('deleted');
+			self.destroy();
+		});
 	},
 
 // --------------------------------------------------------
 	
 	// 
 	// Prepare a no longer needed model instance for garbage collection
+	// 
+	// @return void
 	// 
 	destroy: function() {
 		this.emit('destroy');
@@ -488,20 +558,25 @@ var Model = module.exports = AppObject.extend({
 // 
 // This function fetches the list endpoint URL for the model
 // 
+// @return string
+// 
 Model.url = function() {
 	return this.prototype.reqUrl.call({
 		attributes: { },
 		url: this.prototype.url,
-		id: function() { return null; },
-		get: function() { return null; }
+		id: function() { return ''; },
+		get: function() { return ''; }
 	});
 };
 
 // 
 // Make sure that new Model classes have the default static methods/properties
 // 
+// @return void
+// 
 Model.onExtend = function() {
 	this.url = Model.url;
+	this.modelName = this.prototype.name || this.url().split('/')[1].replace(/\{$/, '');
 	this.onExtend = Model.onExtend;
 	this.Collection = Collection.extend({
 		model: this
@@ -511,6 +586,14 @@ Model.onExtend = function() {
 // 
 // Check if a variable is a Model (not a model instance)
 // 
+// @param {value} the value to test
+// @return boolean
+// 
 Model.isModel = function(value) {
 	return (typeof value === 'function' && value.inherits && value.inherits(Model));
 };
+
+// 
+// Add any statics defined in the store
+// 
+_.extend(Model, modelStore.statics);

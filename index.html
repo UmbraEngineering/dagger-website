@@ -34,7 +34,7 @@
 		window.History = {options: {html4Mode: true}};
 
 		// Add the /lib directory to the require path
-		require.paths.push('/lib');
+		require.paths.push('/lib', '/vendor');
 
 		// Polyfill JSON if needed
 		JSON || require('json2');

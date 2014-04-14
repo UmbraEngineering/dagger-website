@@ -25,6 +25,27 @@ module.exports = _;
 // 
 
 _.mixin({
+
+	// 
+	// Like Node's process.nextTick, with the added advantage of allowing scope binding
+	// 
+	nextTick: function(scope, func) {
+		if (arguments.length === 1) {
+			func = scope;
+			scope = null;
+		}
+
+		setTimeout(function() {
+			func.call(scope);
+		}, 0);
+	},
+
+	// 
+	// _.pick, except this excepts an array of keys
+	// 
+	pickArray: function(obj, keys) {
+		return _.pick.apply([obj].concat(keys));
+	},
 	
 	// 
 	// Allows filtering an array in place
