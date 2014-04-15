@@ -13,6 +13,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-handlebars');
 	grunt.loadNpmTasks('grunt-myth');
+	grunt.loadNpmTasks('grunt-git');
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
@@ -94,19 +95,17 @@ module.exports = function(grunt) {
 		},
 		
 		uglify: {
+			commonjs: {
+				src: buildPath + '/js/common.js',
+				dest: buildPath + '/js/common.min.js'
+			},
 			lib: {
 				src: buildPath + '/js/lib.js',
-				dest: buildPath + '/js/lib.min.js',
-				options: {
-					banner: '/*! Todo Demo App - JavaScript lib file */'
-				}
+				dest: buildPath + '/js/lib.min.js'
 			},
 			app: {
 				src: buildPath + '/js/app.js',
-				dest: buildPath + '/js/app.min.js',
-				options: {
-					banner: '/*! Todo Demo App - JavaScript app file */'
-				}
+				dest: buildPath + '/js/app.min.js'
 			}
 		},
 
@@ -136,6 +135,33 @@ module.exports = function(grunt) {
 					}
 				}
 			}
+		},
+
+		gitpush: {
+			github: {
+				options: {
+					remote: 'origin',
+					branch: 'master'
+				}
+			},
+			heroku: {
+				options: {
+					remote: 'heroku',
+					branch: 'master'
+				}
+			}
+		},
+
+		gitcommit: {
+			deploy_build: {
+				options: {
+					ignoreEmpty: true,
+					message: 'deploy build'
+				},
+				files: {
+					src: [ buildPath ]
+				}
+			}
 		}
 
 	});
@@ -158,9 +184,11 @@ module.exports = function(grunt) {
 
 // --------------------------------------------------------
 
-	grunt.registerTask('js', ['jshint', 'templates', 'commonjs', 'concat:lib', 'concat:app']);//, 'uglify:lib', 'uglify:app']);
+	grunt.registerTask('js', ['jshint', 'templates', 'commonjs', 'concat:lib', 'concat:app']);
 	grunt.registerTask('css', ['concat:appCss', 'myth', 'concat:css', 'cssmin']);
 	grunt.registerTask('templates', ['handlebars']);
 	grunt.registerTask('default', ['mkdir:build', 'js', 'css']);
+	grunt.registerTask('deploy', ['default', 'uglify:commonjs', 'uglify:lib', 'uglify:app',
+		'gitcommit:deploy_build', 'gitpush:heroku']);
 
 };

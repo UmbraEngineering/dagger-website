@@ -23,7 +23,8 @@
     "grunt-mkdir": "~0.1.1",
     "grunt-myth": "~0.1.0",
     "express": "~3.4.7",
-    "handlebars": "^2.0.0-alpha.2"
+    "handlebars": "^2.0.0-alpha.2",
+    "grunt-git": "^0.2.6"
   },
   "engines": {
     "node": "0.11.8"
