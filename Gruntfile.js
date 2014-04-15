@@ -189,6 +189,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('templates', ['handlebars']);
 	grunt.registerTask('default', ['mkdir:build', 'js', 'css']);
 	grunt.registerTask('deploy', ['default', 'uglify:commonjs', 'uglify:lib', 'uglify:app',
-		'gitcommit:deploy_build', 'gitpush:heroku']);
+		'gitcommit:deploy_build', 'gitpush:github', 'gitpush:heroku']);
 
 };
