@@ -26069,3 +26069,1238 @@ exports.random = function() {
 };
  
  }; /* ==  End source for module /lib/uuid-v4.js  == */ return module; }());;
+;require._modules["/vendor/cookies.js"] = (function() { var __filename = "/vendor/cookies.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/cookies.js  == */ var __module__ = function() { 
+ /*!
+ * Cookies.js - 0.3.1
+ * Wednesday, April 24 2013 @ 2:28 AM EST
+ *
+ * Copyright (c) 2013, Scott Hamper
+ * Licensed under the MIT license,
+ * http://www.opensource.org/licenses/MIT
+ */
+(function (undefined) {
+    'use strict';
+
+    var Cookies = function (key, value, options) {
+        return arguments.length === 1 ?
+            Cookies.get(key) : Cookies.set(key, value, options);
+    };
+
+    // Allows for setter injection in unit tests
+    Cookies._document = document;
+    Cookies._navigator = navigator;
+
+    Cookies.defaults = {
+        path: '/'
+    };
+
+    Cookies.get = function (key) {
+        if (Cookies._cachedDocumentCookie !== Cookies._document.cookie) {
+            Cookies._renewCache();
+        }
+
+        return Cookies._cache[key];
+    };
+
+    Cookies.set = function (key, value, options) {
+        options = Cookies._getExtendedOptions(options);
+        options.expires = Cookies._getExpiresDate(value === undefined ? -1 : options.expires);
+
+        Cookies._document.cookie = Cookies._generateCookieString(key, value, options);
+
+        return Cookies;
+    };
+
+    Cookies.expire = function (key, options) {
+        return Cookies.set(key, undefined, options);
+    };
+
+    Cookies._getExtendedOptions = function (options) {
+        return {
+            path: options && options.path || Cookies.defaults.path,
+            domain: options && options.domain || Cookies.defaults.domain,
+            expires: options && options.expires || Cookies.defaults.expires,
+            secure: options && options.secure !== undefined ?  options.secure : Cookies.defaults.secure
+        };
+    };
+
+    Cookies._isValidDate = function (date) {
+        return Object.prototype.toString.call(date) === '[object Date]' && !isNaN(date.getTime());
+    };
+
+    Cookies._getExpiresDate = function (expires, now) {
+        now = now || new Date();
+        switch (typeof expires) {
+            case 'number': expires = new Date(now.getTime() + expires * 1000); break;
+            case 'string': expires = new Date(expires); break;
+        }
+
+        if (expires && !Cookies._isValidDate(expires)) {
+            throw new Error('`expires` parameter cannot be converted to a valid Date instance');
+        }
+
+        return expires;
+    };
+
+    Cookies._generateCookieString = function (key, value, options) {
+        key = encodeURIComponent(key);
+        value = (value + '').replace(/[^!#$&-+\--:<-\[\]-~]/g, encodeURIComponent);
+        options = options || {};
+
+        var cookieString = key + '=' + value;
+        cookieString += options.path ? ';path=' + options.path : '';
+        cookieString += options.domain ? ';domain=' + options.domain : '';
+        cookieString += options.expires ? ';expires=' + options.expires.toUTCString() : '';
+        cookieString += options.secure ? ';secure' : '';
+
+        return cookieString;
+    };
+
+    Cookies._getCookieObjectFromString = function (documentCookie) {
+        var cookieObject = {};
+        var cookiesArray = documentCookie ? documentCookie.split('; ') : [];
+
+        for (var i = 0; i < cookiesArray.length; i++) {
+            var cookieKvp = Cookies._getKeyValuePairFromCookieString(cookiesArray[i]);
+
+            if (cookieObject[cookieKvp.key] === undefined) {
+                cookieObject[cookieKvp.key] = cookieKvp.value;
+            }
+        }
+
+        return cookieObject;
+    };
+
+    Cookies._getKeyValuePairFromCookieString = function (cookieString) {
+        // "=" is a valid character in a cookie value according to RFC6265, so cannot `split('=')`
+        var separatorIndex = cookieString.indexOf('=');
+
+        // IE omits the "=" when the cookie value is an empty string
+        separatorIndex = separatorIndex < 0 ? cookieString.length : separatorIndex;
+
+        return {
+            key: decodeURIComponent(cookieString.substr(0, separatorIndex)),
+            value: decodeURIComponent(cookieString.substr(separatorIndex + 1))
+        };
+    };
+
+    Cookies._renewCache = function () {
+        Cookies._cache = Cookies._getCookieObjectFromString(Cookies._document.cookie);
+        Cookies._cachedDocumentCookie = Cookies._document.cookie;
+    };
+
+    Cookies._areEnabled = function () {
+        return Cookies._navigator.cookieEnabled ||
+            Cookies.set('cookies.js', 1).get('cookies.js') === '1';
+    };
+
+    Cookies.enabled = Cookies._areEnabled();
+
+    // AMD support
+    if (typeof define === 'function' && define.amd) {
+        define(function () { return Cookies; });
+    // CommonJS and Node.js module support.
+    } else if (typeof exports !== 'undefined') {
+        // Support Node.js specific `module.exports` (which can be a function)
+        if (typeof module !== 'undefined' && module.exports) {
+            exports = module.exports = Cookies;
+        }
+        // But always support CommonJS module 1.1.1 spec (`exports` cannot be a function)
+        exports.Cookies = Cookies;
+    } else {
+        window.Cookies = Cookies;
+    }
+})(); 
+ }; /* ==  End source for module /vendor/cookies.js  == */ return module; }());;
+;require._modules["/vendor/jquery.spin.js"] = (function() { var __filename = "/vendor/jquery.spin.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/jquery.spin.js  == */ var __module__ = function() { 
+ /**
+ * Copyright (c) 2011-2013 Felix Gnass
+ * Licensed under the MIT license
+ */
+
+/*
+
+Basic Usage:
+============
+
+$('#el').spin(); // Creates a default Spinner using the text color of #el.
+$('#el').spin({ ... }); // Creates a Spinner using the provided options.
+
+$('#el').spin(false); // Stops and removes the spinner.
+
+Using Presets:
+==============
+
+$('#el').spin('small'); // Creates a 'small' Spinner using the text color of #el.
+$('#el').spin('large', '#fff'); // Creates a 'large' white Spinner.
+
+Adding a custom preset:
+=======================
+
+$.fn.spin.presets.flower = {
+  lines: 9
+  length: 10
+  width: 20
+  radius: 0
+}
+
+$('#el').spin('flower', 'red');
+
+*/
+
+(function(factory) {
+
+  if (typeof exports == 'object') {
+    // CommonJS
+    factory(require('jquery'), require('spin'))
+  }
+  else if (typeof define == 'function' && define.amd) {
+    // AMD, register as anonymous module
+    define(['jquery', 'spin'], factory)
+  }
+  else {
+    // Browser globals
+    if (!window.Spinner) throw new Error('Spin.js not present')
+    factory(window.jQuery, window.Spinner)
+  }
+
+}(function($, Spinner) {
+
+  $.fn.spin = function(opts, color) {
+
+    return this.each(function() {
+      var $this = $(this),
+        data = $this.data();
+
+      if (data.spinner) {
+        data.spinner.stop();
+        delete data.spinner;
+      }
+      if (opts !== false) {
+        opts = $.extend(
+          { color: color || $this.css('color') },
+          $.fn.spin.presets[opts] || opts
+        )
+        data.spinner = new Spinner(opts).spin(this)
+      }
+    })
+  }
+
+  $.fn.spin.presets = {
+    tiny: { lines: 8, length: 2, width: 2, radius: 3 },
+    small: { lines: 8, length: 4, width: 3, radius: 5 },
+    large: { lines: 10, length: 8, width: 4, radius: 8 }
+  }
+
+})); 
+ }; /* ==  End source for module /vendor/jquery.spin.js  == */ return module; }());;
+;require._modules["/vendor/prism/bash.js"] = (function() { var __filename = "/vendor/prism/bash.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/prism/bash.js  == */ var __module__ = function() { 
+ Prism.languages.bash = Prism.languages.extend('clike', {
+	'comment': {
+		pattern: /(^|[^"{\\])(#.*?(\r?\n|$))/g,
+		lookbehind: true
+	},
+	'string': {
+		//allow multiline string
+		pattern: /("|')(\\?[\s\S])*?\1/g,
+		inside: {
+			//'property' class reused for bash variables
+			'property': /\$([a-zA-Z0-9_#\?\-\*!@]+|\{[^\}]+\})/g
+		}
+	},
+	'keyword': /(^\$)|\b(if|then|else|elif|fi|for|break|continue|while|in|case|function|select|do|done|until|echo|exit|return|set|declare)\b/g
+});
+
+Prism.languages.insertBefore('bash', 'keyword', {
+	//'property' class reused for bash variables
+	'property': /\$([a-zA-Z0-9_#\?\-\*!@]+|\{[^}]+\})/g
+});
+Prism.languages.insertBefore('bash', 'comment', {
+	//shebang must be before comment, 'important' class from css reused
+	'important': /(^#!\s*\/bin\/bash)|(^#!\s*\/bin\/sh)/g
+}); 
+ }; /* ==  End source for module /vendor/prism/bash.js  == */ return module; }());;
+;require._modules["/vendor/prism/http.js"] = (function() { var __filename = "/vendor/prism/http.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/prism/http.js  == */ var __module__ = function() { 
+ Prism.languages.http = {
+    'request-line': {
+        pattern: /^(POST|GET|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)\b\shttps?:\/\/\S+\sHTTP\/[0-9.]+/g,
+        inside: {
+            // HTTP Verb
+            property: /^\b(POST|GET|PUT|PATCH|DELETE|OPTIONS|TRACE|CONNECT)\b/g,
+            // Path or query argument
+            'attr-name': /:\w+/g
+        }
+    },
+    'response-status': {
+        pattern: /^HTTP\/1.[01] [0-9]+.*/g,
+        inside: {
+            // Status, e.g. 200 OK
+            property: /[0-9]+[A-Z\s-]+$/g
+        }
+    },
+    // HTTP header name
+    keyword: /^[\w-]+:(?=.+)/gm
+};
+
+// Create a mapping of Content-Type headers to language definitions
+var httpLanguages = {
+    'application/json': Prism.languages.javascript,
+    'application/xml': Prism.languages.markup,
+    'text/xml': Prism.languages.markup,
+    'text/html': Prism.languages.markup
+};
+
+// Insert each content type parser that has its associated language
+// currently loaded.
+for (var contentType in httpLanguages) {
+    if (httpLanguages[contentType]) {
+        var options = {};
+        options[contentType] = {
+            pattern: new RegExp('(content-type:\\s*' + contentType + '[\\w\\W]*?)\\n\\n[\\w\\W]*', 'gi'),
+            lookbehind: true,
+            inside: {
+                rest: httpLanguages[contentType]
+            }
+        };
+        Prism.languages.insertBefore('http', 'keyword', options);
+    }
+} 
+ }; /* ==  End source for module /vendor/prism/http.js  == */ return module; }());;
+;require._modules["/vendor/prism/index.js"] = (function() { var __filename = "/vendor/prism/index.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/prism/index.js  == */ var __module__ = function() { 
+ 
+require('./prism');
+require('./bash');
+require('./http');
+
+module.exports = Prism;
+
+try {
+	window.Prism = void(0);
+	delete window.Prism;
+} catch (e) { }
+ 
+ }; /* ==  End source for module /vendor/prism/index.js  == */ return module; }());;
+;require._modules["/vendor/prism/prism.js"] = (function() { var __filename = "/vendor/prism/prism.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/prism/prism.js  == */ var __module__ = function() { 
+ 
+
+/* **********************************************
+     Begin prism-core.js
+********************************************** */
+
+/**
+ * Prism: Lightweight, robust, elegant syntax highlighting
+ * MIT license http://www.opensource.org/licenses/mit-license.php/
+ * @author Lea Verou http://lea.verou.me
+ */
+
+(function(){
+
+// Private helper vars
+var lang = /\blang(?:uage)?-(?!\*)(\w+)\b/i;
+
+var _ = self.Prism = {
+	util: {
+		type: function (o) { 
+			return Object.prototype.toString.call(o).match(/\[object (\w+)\]/)[1];
+		},
+		
+		// Deep clone a language definition (e.g. to extend it)
+		clone: function (o) {
+			var type = _.util.type(o);
+
+			switch (type) {
+				case 'Object':
+					var clone = {};
+					
+					for (var key in o) {
+						if (o.hasOwnProperty(key)) {
+							clone[key] = _.util.clone(o[key]);
+						}
+					}
+					
+					return clone;
+					
+				case 'Array':
+					return o.slice();
+			}
+			
+			return o;
+		}
+	},
+	
+	languages: {
+		extend: function (id, redef) {
+			var lang = _.util.clone(_.languages[id]);
+			
+			for (var key in redef) {
+				lang[key] = redef[key];
+			}
+			
+			return lang;
+		},
+		
+		// Insert a token before another token in a language literal
+		insertBefore: function (inside, before, insert, root) {
+			root = root || _.languages;
+			var grammar = root[inside];
+			var ret = {};
+				
+			for (var token in grammar) {
+			
+				if (grammar.hasOwnProperty(token)) {
+					
+					if (token == before) {
+					
+						for (var newToken in insert) {
+						
+							if (insert.hasOwnProperty(newToken)) {
+								ret[newToken] = insert[newToken];
+							}
+						}
+					}
+					
+					ret[token] = grammar[token];
+				}
+			}
+			
+			return root[inside] = ret;
+		},
+		
+		// Traverse a language definition with Depth First Search
+		DFS: function(o, callback) {
+			for (var i in o) {
+				callback.call(o, i, o[i]);
+				
+				if (_.util.type(o) === 'Object') {
+					_.languages.DFS(o[i], callback);
+				}
+			}
+		}
+	},
+
+	highlightAll: function(async, callback) {
+		var elements = document.querySelectorAll('code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code');
+
+		for (var i=0, element; element = elements[i++];) {
+			_.highlightElement(element, async === true, callback);
+		}
+	},
+		
+	highlightElement: function(element, async, callback) {
+		// Find language
+		var language, grammar, parent = element;
+		
+		while (parent && !lang.test(parent.className)) {
+			parent = parent.parentNode;
+		}
+		
+		if (parent) {
+			language = (parent.className.match(lang) || [,''])[1];
+			grammar = _.languages[language];
+		}
+
+		if (!grammar) {
+			return;
+		}
+		
+		// Set language on the element, if not present
+		element.className = element.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language;
+		
+		// Set language on the parent, for styling
+		parent = element.parentNode;
+		
+		if (/pre/i.test(parent.nodeName)) {
+			parent.className = parent.className.replace(lang, '').replace(/\s+/g, ' ') + ' language-' + language; 
+		}
+
+		var code = element.textContent;
+		
+		if(!code) {
+			return;
+		}
+		
+		code = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\u00a0/g, ' ');
+		
+		var env = {
+			element: element,
+			language: language,
+			grammar: grammar,
+			code: code
+		};
+		
+		_.hooks.run('before-highlight', env);
+		
+		if (async && self.Worker) {
+			var worker = new Worker(_.filename);	
+			
+			worker.onmessage = function(evt) {
+				env.highlightedCode = Token.stringify(JSON.parse(evt.data), language);
+
+				_.hooks.run('before-insert', env);
+
+				env.element.innerHTML = env.highlightedCode;
+				
+				callback && callback.call(env.element);
+				_.hooks.run('after-highlight', env);
+			};
+			
+			worker.postMessage(JSON.stringify({
+				language: env.language,
+				code: env.code
+			}));
+		}
+		else {
+			env.highlightedCode = _.highlight(env.code, env.grammar, env.language)
+
+			_.hooks.run('before-insert', env);
+
+			env.element.innerHTML = env.highlightedCode;
+			
+			callback && callback.call(element);
+			
+			_.hooks.run('after-highlight', env);
+		}
+	},
+	
+	highlight: function (text, grammar, language) {
+		return Token.stringify(_.tokenize(text, grammar), language);
+	},
+	
+	tokenize: function(text, grammar, language) {
+		var Token = _.Token;
+		
+		var strarr = [text];
+		
+		var rest = grammar.rest;
+		
+		if (rest) {
+			for (var token in rest) {
+				grammar[token] = rest[token];
+			}
+			
+			delete grammar.rest;
+		}
+								
+		tokenloop: for (var token in grammar) {
+			if(!grammar.hasOwnProperty(token) || !grammar[token]) {
+				continue;
+			}
+			
+			var pattern = grammar[token], 
+				inside = pattern.inside,
+				lookbehind = !!pattern.lookbehind,
+				lookbehindLength = 0;
+			
+			pattern = pattern.pattern || pattern;
+			
+			for (var i=0; i<strarr.length; i++) { // Donâ€™t cache length as it changes during the loop
+				
+				var str = strarr[i];
+				
+				if (strarr.length > text.length) {
+					// Something went terribly wrong, ABORT, ABORT!
+					break tokenloop;
+				}
+				
+				if (str instanceof Token) {
+					continue;
+				}
+				
+				pattern.lastIndex = 0;
+				
+				var match = pattern.exec(str);
+				
+				if (match) {
+					if(lookbehind) {
+						lookbehindLength = match[1].length;
+					}
+
+					var from = match.index - 1 + lookbehindLength,
+					    match = match[0].slice(lookbehindLength),
+					    len = match.length,
+					    to = from + len,
+						before = str.slice(0, from + 1),
+						after = str.slice(to + 1); 
+
+					var args = [i, 1];
+					
+					if (before) {
+						args.push(before);
+					}
+					
+					var wrapped = new Token(token, inside? _.tokenize(match, inside) : match);
+					
+					args.push(wrapped);
+					
+					if (after) {
+						args.push(after);
+					}
+					
+					Array.prototype.splice.apply(strarr, args);
+				}
+			}
+		}
+
+		return strarr;
+	},
+	
+	hooks: {
+		all: {},
+		
+		add: function (name, callback) {
+			var hooks = _.hooks.all;
+			
+			hooks[name] = hooks[name] || [];
+			
+			hooks[name].push(callback);
+		},
+		
+		run: function (name, env) {
+			var callbacks = _.hooks.all[name];
+			
+			if (!callbacks || !callbacks.length) {
+				return;
+			}
+			
+			for (var i=0, callback; callback = callbacks[i++];) {
+				callback(env);
+			}
+		}
+	}
+};
+
+var Token = _.Token = function(type, content) {
+	this.type = type;
+	this.content = content;
+};
+
+Token.stringify = function(o, language, parent) {
+	if (typeof o == 'string') {
+		return o;
+	}
+
+	if (Object.prototype.toString.call(o) == '[object Array]') {
+		return o.map(function(element) {
+			return Token.stringify(element, language, o);
+		}).join('');
+	}
+	
+	var env = {
+		type: o.type,
+		content: Token.stringify(o.content, language, parent),
+		tag: 'span',
+		classes: ['token', o.type],
+		attributes: {},
+		language: language,
+		parent: parent
+	};
+	
+	if (env.type == 'comment') {
+		env.attributes['spellcheck'] = 'true';
+	}
+	
+	_.hooks.run('wrap', env);
+	
+	var attributes = '';
+	
+	for (var name in env.attributes) {
+		attributes += name + '="' + (env.attributes[name] || '') + '"';
+	}
+	
+	return '<' + env.tag + ' class="' + env.classes.join(' ') + '" ' + attributes + '>' + env.content + '</' + env.tag + '>';
+	
+};
+
+if (!self.document) {
+	// In worker
+	self.addEventListener('message', function(evt) {
+		var message = JSON.parse(evt.data),
+		    lang = message.language,
+		    code = message.code;
+		
+		self.postMessage(JSON.stringify(_.tokenize(code, _.languages[lang])));
+		self.close();
+	}, false);
+	
+	return;
+}
+
+// Get current script and highlight
+var script = document.getElementsByTagName('script');
+
+script = script[script.length - 1];
+
+if (script) {
+	_.filename = script.src;
+	
+	if (document.addEventListener && !script.hasAttribute('data-manual')) {
+		document.addEventListener('DOMContentLoaded', _.highlightAll);
+	}
+}
+
+})();
+
+/* **********************************************
+     Begin prism-markup.js
+********************************************** */
+
+Prism.languages.markup = {
+	'comment': /&lt;!--[\w\W]*?-->/g,
+	'prolog': /&lt;\?.+?\?>/,
+	'doctype': /&lt;!DOCTYPE.+?>/,
+	'cdata': /&lt;!\[CDATA\[[\w\W]*?]]>/i,
+	'tag': {
+		pattern: /&lt;\/?[\w:-]+\s*(?:\s+[\w:-]+(?:=(?:("|')(\\?[\w\W])*?\1|\w+))?\s*)*\/?>/gi,
+		inside: {
+			'tag': {
+				pattern: /^&lt;\/?[\w:-]+/i,
+				inside: {
+					'punctuation': /^&lt;\/?/,
+					'namespace': /^[\w-]+?:/
+				}
+			},
+			'attr-value': {
+				pattern: /=(?:('|")[\w\W]*?(\1)|[^\s>]+)/gi,
+				inside: {
+					'punctuation': /=|>|"/g
+				}
+			},
+			'punctuation': /\/?>/g,
+			'attr-name': {
+				pattern: /[\w:-]+/g,
+				inside: {
+					'namespace': /^[\w-]+?:/
+				}
+			}
+			
+		}
+	},
+	'entity': /&amp;#?[\da-z]{1,8};/gi
+};
+
+// Plugin to make entity title show the real entity, idea by Roman Komarov
+Prism.hooks.add('wrap', function(env) {
+
+	if (env.type === 'entity') {
+		env.attributes['title'] = env.content.replace(/&amp;/, '&');
+	}
+});
+
+/* **********************************************
+     Begin prism-css.js
+********************************************** */
+
+Prism.languages.css = {
+	'comment': /\/\*[\w\W]*?\*\//g,
+	'atrule': {
+		pattern: /@[\w-]+?.*?(;|(?=\s*{))/gi,
+		inside: {
+			'punctuation': /[;:]/g
+		}
+	},
+	'url': /url\((["']?).*?\1\)/gi,
+	'selector': /[^\{\}\s][^\{\};]*(?=\s*\{)/g,
+	'property': /(\b|\B)[\w-]+(?=\s*:)/ig,
+	'string': /("|')(\\?.)*?\1/g,
+	'important': /\B!important\b/gi,
+	'ignore': /&(lt|gt|amp);/gi,
+	'punctuation': /[\{\};:]/g
+};
+
+if (Prism.languages.markup) {
+	Prism.languages.insertBefore('markup', 'tag', {
+		'style': {
+			pattern: /(&lt;|<)style[\w\W]*?(>|&gt;)[\w\W]*?(&lt;|<)\/style(>|&gt;)/ig,
+			inside: {
+				'tag': {
+					pattern: /(&lt;|<)style[\w\W]*?(>|&gt;)|(&lt;|<)\/style(>|&gt;)/ig,
+					inside: Prism.languages.markup.tag.inside
+				},
+				rest: Prism.languages.css
+			}
+		}
+	});
+}
+
+/* **********************************************
+     Begin prism-clike.js
+********************************************** */
+
+Prism.languages.clike = {
+	'comment': {
+		pattern: /(^|[^\\])(\/\*[\w\W]*?\*\/|(^|[^:])\/\/.*?(\r?\n|$))/g,
+		lookbehind: true
+	},
+	'string': /("|')(\\?.)*?\1/g,
+	'class-name': {
+		pattern: /((?:class|interface|extends|implements|trait|instanceof|new)\s+)[a-z0-9_\.\\]+/ig,
+		lookbehind: true,
+		inside: {
+			punctuation: /(\.|\\)/
+		}
+	},
+	'keyword': /\b(if|else|while|do|for|return|in|instanceof|function|new|try|catch|finally|null|break|continue)\b/g,
+	'boolean': /\b(true|false)\b/g,
+	'function': {
+		pattern: /[a-z0-9_]+\(/ig,
+		inside: {
+			punctuation: /\(/
+		}
+	},
+	'number': /\b-?(0x[\dA-Fa-f]+|\d*\.?\d+([Ee]-?\d+)?)\b/g,
+	'operator': /[-+]{1,2}|!|=?&lt;|=?&gt;|={1,2}|(&amp;){1,2}|\|?\||\?|\*|\/|\~|\^|\%/g,
+	'ignore': /&(lt|gt|amp);/gi,
+	'punctuation': /[{}[\];(),.:]/g
+};
+
+/* **********************************************
+     Begin prism-javascript.js
+********************************************** */
+
+Prism.languages.javascript = Prism.languages.extend('clike', {
+	'keyword': /\b(var|let|if|else|while|do|for|return|in|instanceof|function|new|with|typeof|try|catch|finally|null|break|continue)\b/g,
+	'number': /\b-?(0x[\dA-Fa-f]+|\d*\.?\d+([Ee]-?\d+)?|NaN|-?Infinity)\b/g
+});
+
+Prism.languages.insertBefore('javascript', 'keyword', {
+	'regex': {
+		pattern: /(^|[^/])\/(?!\/)(\[.+?]|\\.|[^/\r\n])+\/[gim]{0,3}(?=\s*($|[\r\n,.;})]))/g,
+		lookbehind: true
+	}
+});
+
+if (Prism.languages.markup) {
+	Prism.languages.insertBefore('markup', 'tag', {
+		'script': {
+			pattern: /(&lt;|<)script[\w\W]*?(>|&gt;)[\w\W]*?(&lt;|<)\/script(>|&gt;)/ig,
+			inside: {
+				'tag': {
+					pattern: /(&lt;|<)script[\w\W]*?(>|&gt;)|(&lt;|<)\/script(>|&gt;)/ig,
+					inside: Prism.languages.markup.tag.inside
+				},
+				rest: Prism.languages.javascript
+			}
+		}
+	});
+}
+
+/* **********************************************
+     Begin prism-file-highlight.js
+********************************************** */
+
+(function(){
+
+if (!self.Prism || !self.document || !document.querySelector) {
+	return;
+}
+
+var Extensions = {
+	'js': 'javascript',
+	'html': 'markup',
+	'svg': 'markup'
+};
+
+Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function(pre) {
+	var src = pre.getAttribute('data-src');
+	var extension = (src.match(/\.(\w+)$/) || [,''])[1];
+	var language = Extensions[extension] || extension;
+	
+	var code = document.createElement('code');
+	code.className = 'language-' + language;
+	
+	pre.textContent = '';
+	
+	code.textContent = 'Loadingâ€¦';
+	
+	pre.appendChild(code);
+	
+	var xhr = new XMLHttpRequest();
+	
+	xhr.open('GET', src, true);
+
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			
+			if (xhr.status < 400 && xhr.responseText) {
+				code.textContent = xhr.responseText;
+			
+				Prism.highlightElement(code);
+			}
+			else if (xhr.status >= 400) {
+				code.textContent = 'âœ– Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+			}
+			else {
+				code.textContent = 'âœ– Error: File does not exist or is empty';
+			}
+		}
+	};
+	
+	xhr.send(null);
+});
+
+})(); 
+ }; /* ==  End source for module /vendor/prism/prism.js  == */ return module; }());;
+;require._modules["/vendor/spin.js"] = (function() { var __filename = "/vendor/spin.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/spin.js  == */ var __module__ = function() { 
+ //fgnass.github.com/spin.js#v1.3.2
+
+/**
+ * Copyright (c) 2011-2013 Felix Gnass
+ * Licensed under the MIT license
+ */
+(function(root, factory) {
+
+  /* CommonJS */
+  if (typeof exports == 'object')  module.exports = factory()
+
+  /* AMD module */
+  else if (typeof define == 'function' && define.amd) define(factory)
+
+  /* Browser global */
+  else root.Spinner = factory()
+}
+(this, function() {
+  "use strict";
+
+  var prefixes = ['webkit', 'Moz', 'ms', 'O'] /* Vendor prefixes */
+    , animations = {} /* Animation rules keyed by their name */
+    , useCssAnimations /* Whether to use CSS animations or setTimeout */
+
+  /**
+   * Utility function to create elements. If no tag name is given,
+   * a DIV is created. Optionally properties can be passed.
+   */
+  function createEl(tag, prop) {
+    var el = document.createElement(tag || 'div')
+      , n
+
+    for(n in prop) el[n] = prop[n]
+    return el
+  }
+
+  /**
+   * Appends children and returns the parent.
+   */
+  function ins(parent /* child1, child2, ...*/) {
+    for (var i=1, n=arguments.length; i<n; i++)
+      parent.appendChild(arguments[i])
+
+    return parent
+  }
+
+  /**
+   * Insert a new stylesheet to hold the @keyframe or VML rules.
+   */
+  var sheet = (function() {
+    var el = createEl('style', {type : 'text/css'})
+    ins(document.getElementsByTagName('head')[0], el)
+    return el.sheet || el.styleSheet
+  }())
+
+  /**
+   * Creates an opacity keyframe animation rule and returns its name.
+   * Since most mobile Webkits have timing issues with animation-delay,
+   * we create separate rules for each line/segment.
+   */
+  function addAnimation(alpha, trail, i, lines) {
+    var name = ['opacity', trail, ~~(alpha*100), i, lines].join('-')
+      , start = 0.01 + i/lines * 100
+      , z = Math.max(1 - (1-alpha) / trail * (100-start), alpha)
+      , prefix = useCssAnimations.substring(0, useCssAnimations.indexOf('Animation')).toLowerCase()
+      , pre = prefix && '-' + prefix + '-' || ''
+
+    if (!animations[name]) {
+      sheet.insertRule(
+        '@' + pre + 'keyframes ' + name + '{' +
+        '0%{opacity:' + z + '}' +
+        start + '%{opacity:' + alpha + '}' +
+        (start+0.01) + '%{opacity:1}' +
+        (start+trail) % 100 + '%{opacity:' + alpha + '}' +
+        '100%{opacity:' + z + '}' +
+        '}', sheet.cssRules.length)
+
+      animations[name] = 1
+    }
+
+    return name
+  }
+
+  /**
+   * Tries various vendor prefixes and returns the first supported property.
+   */
+  function vendor(el, prop) {
+    var s = el.style
+      , pp
+      , i
+
+    prop = prop.charAt(0).toUpperCase() + prop.slice(1)
+    for(i=0; i<prefixes.length; i++) {
+      pp = prefixes[i]+prop
+      if(s[pp] !== undefined) return pp
+    }
+    if(s[prop] !== undefined) return prop
+  }
+
+  /**
+   * Sets multiple style properties at once.
+   */
+  function css(el, prop) {
+    for (var n in prop)
+      el.style[vendor(el, n)||n] = prop[n]
+
+    return el
+  }
+
+  /**
+   * Fills in default values.
+   */
+  function merge(obj) {
+    for (var i=1; i < arguments.length; i++) {
+      var def = arguments[i]
+      for (var n in def)
+        if (obj[n] === undefined) obj[n] = def[n]
+    }
+    return obj
+  }
+
+  /**
+   * Returns the absolute page-offset of the given element.
+   */
+  function pos(el) {
+    var o = { x:el.offsetLeft, y:el.offsetTop }
+    while((el = el.offsetParent))
+      o.x+=el.offsetLeft, o.y+=el.offsetTop
+
+    return o
+  }
+
+  /**
+   * Returns the line color from the given string or array.
+   */
+  function getColor(color, idx) {
+    return typeof color == 'string' ? color : color[idx % color.length]
+  }
+
+  // Built-in defaults
+
+  var defaults = {
+    lines: 12,            // The number of lines to draw
+    length: 7,            // The length of each line
+    width: 5,             // The line thickness
+    radius: 10,           // The radius of the inner circle
+    rotate: 0,            // Rotation offset
+    corners: 1,           // Roundness (0..1)
+    color: '#000',        // #rgb or #rrggbb
+    direction: 1,         // 1: clockwise, -1: counterclockwise
+    speed: 1,             // Rounds per second
+    trail: 100,           // Afterglow percentage
+    opacity: 1/4,         // Opacity of the lines
+    fps: 20,              // Frames per second when using setTimeout()
+    zIndex: 2e9,          // Use a high z-index by default
+    className: 'spinner', // CSS class to assign to the element
+    top: 'auto',          // center vertically
+    left: 'auto',         // center horizontally
+    position: 'relative'  // element position
+  }
+
+  /** The constructor */
+  function Spinner(o) {
+    if (typeof this == 'undefined') return new Spinner(o)
+    this.opts = merge(o || {}, Spinner.defaults, defaults)
+  }
+
+  // Global defaults that override the built-ins:
+  Spinner.defaults = {}
+
+  merge(Spinner.prototype, {
+
+    /**
+     * Adds the spinner to the given target element. If this instance is already
+     * spinning, it is automatically removed from its previous target b calling
+     * stop() internally.
+     */
+    spin: function(target) {
+      this.stop()
+
+      var self = this
+        , o = self.opts
+        , el = self.el = css(createEl(0, {className: o.className}), {position: o.position, width: 0, zIndex: o.zIndex})
+        , mid = o.radius+o.length+o.width
+        , ep // element position
+        , tp // target position
+
+      if (target) {
+        target.insertBefore(el, target.firstChild||null)
+        tp = pos(target)
+        ep = pos(el)
+        css(el, {
+          left: (o.left == 'auto' ? tp.x-ep.x + (target.offsetWidth >> 1) : parseInt(o.left, 10) + mid) + 'px',
+          top: (o.top == 'auto' ? tp.y-ep.y + (target.offsetHeight >> 1) : parseInt(o.top, 10) + mid)  + 'px'
+        })
+      }
+
+      el.setAttribute('role', 'progressbar')
+      self.lines(el, self.opts)
+
+      if (!useCssAnimations) {
+        // No CSS animation support, use setTimeout() instead
+        var i = 0
+          , start = (o.lines - 1) * (1 - o.direction) / 2
+          , alpha
+          , fps = o.fps
+          , f = fps/o.speed
+          , ostep = (1-o.opacity) / (f*o.trail / 100)
+          , astep = f/o.lines
+
+        ;(function anim() {
+          i++;
+          for (var j = 0; j < o.lines; j++) {
+            alpha = Math.max(1 - (i + (o.lines - j) * astep) % f * ostep, o.opacity)
+
+            self.opacity(el, j * o.direction + start, alpha, o)
+          }
+          self.timeout = self.el && setTimeout(anim, ~~(1000/fps))
+        })()
+      }
+      return self
+    },
+
+    /**
+     * Stops and removes the Spinner.
+     */
+    stop: function() {
+      var el = this.el
+      if (el) {
+        clearTimeout(this.timeout)
+        if (el.parentNode) el.parentNode.removeChild(el)
+        this.el = undefined
+      }
+      return this
+    },
+
+    /**
+     * Internal method that draws the individual lines. Will be overwritten
+     * in VML fallback mode below.
+     */
+    lines: function(el, o) {
+      var i = 0
+        , start = (o.lines - 1) * (1 - o.direction) / 2
+        , seg
+
+      function fill(color, shadow) {
+        return css(createEl(), {
+          position: 'absolute',
+          width: (o.length+o.width) + 'px',
+          height: o.width + 'px',
+          background: color,
+          boxShadow: shadow,
+          transformOrigin: 'left',
+          transform: 'rotate(' + ~~(360/o.lines*i+o.rotate) + 'deg) translate(' + o.radius+'px' +',0)',
+          borderRadius: (o.corners * o.width>>1) + 'px'
+        })
+      }
+
+      for (; i < o.lines; i++) {
+        seg = css(createEl(), {
+          position: 'absolute',
+          top: 1+~(o.width/2) + 'px',
+          transform: o.hwaccel ? 'translate3d(0,0,0)' : '',
+          opacity: o.opacity,
+          animation: useCssAnimations && addAnimation(o.opacity, o.trail, start + i * o.direction, o.lines) + ' ' + 1/o.speed + 's linear infinite'
+        })
+
+        if (o.shadow) ins(seg, css(fill('#000', '0 0 4px ' + '#000'), {top: 2+'px'}))
+        ins(el, ins(seg, fill(getColor(o.color, i), '0 0 1px rgba(0,0,0,.1)')))
+      }
+      return el
+    },
+
+    /**
+     * Internal method that adjusts the opacity of a single line.
+     * Will be overwritten in VML fallback mode below.
+     */
+    opacity: function(el, i, val) {
+      if (i < el.childNodes.length) el.childNodes[i].style.opacity = val
+    }
+
+  })
+
+
+  function initVML() {
+
+    /* Utility function to create a VML tag */
+    function vml(tag, attr) {
+      return createEl('<' + tag + ' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">', attr)
+    }
+
+    // No CSS transforms but VML support, add a CSS rule for VML elements:
+    sheet.addRule('.spin-vml', 'behavior:url(#default#VML)')
+
+    Spinner.prototype.lines = function(el, o) {
+      var r = o.length+o.width
+        , s = 2*r
+
+      function grp() {
+        return css(
+          vml('group', {
+            coordsize: s + ' ' + s,
+            coordorigin: -r + ' ' + -r
+          }),
+          { width: s, height: s }
+        )
+      }
+
+      var margin = -(o.width+o.length)*2 + 'px'
+        , g = css(grp(), {position: 'absolute', top: margin, left: margin})
+        , i
+
+      function seg(i, dx, filter) {
+        ins(g,
+          ins(css(grp(), {rotation: 360 / o.lines * i + 'deg', left: ~~dx}),
+            ins(css(vml('roundrect', {arcsize: o.corners}), {
+                width: r,
+                height: o.width,
+                left: o.radius,
+                top: -o.width>>1,
+                filter: filter
+              }),
+              vml('fill', {color: getColor(o.color, i), opacity: o.opacity}),
+              vml('stroke', {opacity: 0}) // transparent stroke to fix color bleeding upon opacity change
+            )
+          )
+        )
+      }
+
+      if (o.shadow)
+        for (i = 1; i <= o.lines; i++)
+          seg(i, -2, 'progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)')
+
+      for (i = 1; i <= o.lines; i++) seg(i)
+      return ins(el, g)
+    }
+
+    Spinner.prototype.opacity = function(el, i, val, o) {
+      var c = el.firstChild
+      o = o.shadow && o.lines || 0
+      if (c && i+o < c.childNodes.length) {
+        c = c.childNodes[i+o]; c = c && c.firstChild; c = c && c.firstChild
+        if (c) c.opacity = val
+      }
+    }
+  }
+
+  var probe = css(createEl('group'), {behavior: 'url(#default#VML)'})
+
+  if (!vendor(probe, 'transform') && probe.adj) initVML()
+  else useCssAnimations = vendor(probe, 'animation')
+
+  return Spinner
+
+})); 
+ }; /* ==  End source for module /vendor/spin.js  == */ return module; }());;

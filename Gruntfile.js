@@ -2,8 +2,8 @@
 var fs        = require('fs');
 var commonjs  = require('common.js');
 
-var publicPath = './public';
-var buildPath = publicPath + '/build';
+var publicPath  = './public';
+var buildPath   = publicPath + '/build';
 
 module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-mkdir');
@@ -63,7 +63,10 @@ module.exports = function(grunt) {
 		
 		concat: {
 			lib: {
-				src: [buildPath + '/js/lib/**/*.js'],
+				src: [
+					buildPath + '/js/lib/**/*.js',
+					buildPath + '/js/vendor/**/*.js'
+				],
 				dest: buildPath + '/js/lib.js'
 			},
 			app: {
