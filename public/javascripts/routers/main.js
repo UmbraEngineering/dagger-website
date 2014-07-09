@@ -20,6 +20,9 @@ var MainRouter = module.exports = Router.extend({
 	initialize: function() {
 		this.$content = $('#content');
 
+		// Store the currently active view object here
+		this.currentView = null;
+
 		// Handle 404 errors
 		this.bind('notfound');
 		this.on('notfound', this.notfound);
@@ -84,6 +87,9 @@ var MainRouter = module.exports = Router.extend({
 	// 
 	drawViewToContent: function(view, callback) {
 		var $content = this.$content;
+
+		// Store the view
+		this.currentView = view;
 
 		// Fade out the current content
 		$content.animate({ opacity: 0 }, 600, function() {
