@@ -4,22 +4,34 @@ var History   = require('history');
 var AppObject = require('cloak/app-object');
 var _         = require('cloak/underscore');
 
+var defaults = {
+	autoStart: true,
+	isTopLevel: true
+};
+
 // 
 // Router class
 //
 var Router = module.exports = AppObject.extend({
 
 	routes: null,
-	_routes: [ ],
+	_opts: null,
+	_routes: null,
+	_subRouters: null,
 	_isOn: false,
 	_variablePattern: /:([^\/]+)/g,
 	_currentUrl: null,
 	_currentRoute: null,
 	_isAnchor: false,
 
-	init: function() {
+	init: function(opts) {
 		this._super();
 		this._routes = [ ];
+		this._opts = _.defaults(opts || { }, Router.defaults);
+
+		if (this._opts.isTopLevel) {
+			this.topLevel = this;
+		}
 
 		_.forEach(_.keys(this.routes),
 			_.bind(
@@ -29,23 +41,42 @@ var Router = module.exports = AppObject.extend({
 			this)
 		);
 
+		this._subRouters = [ ];
+
 		this.bind('handleAnchor');
 
 		// Listen for history.statechange events
 		this.bind('_onstatechange');
-		if (History.enabled) {
-			this.on();
+		if (History.enabled && this._opts.autoStart) {
+			this.start();
 		}
 
 		// Call any given initialize method
 		if (typeof this.initialize === 'function') {
 			this.initialize.apply(this, arguments);
 		}
+	},
 
-		// When we initialize a new router, we trigger a statechange event. This shouldn't
-		// cause any issues, though, as we ignore statechanges that have the same url as
-		// the current one
-		cloak.$win.trigger('statechange');
+	// 
+	// Add another router's routes to this one
+	// 
+	// @param {router} the router to use
+	// @return this
+	// 
+	use: function(router) {
+		// If given a router constructor, create an instance
+		if (typeof router === 'function') {
+			router = new router({
+				autoStart: false,
+				isTopLevel: false
+			});
+		}
+
+		router.parent = this;
+		router.topLevel = this.topLevel;
+		this._subRouters.push(router);
+
+		return this;
 	},
 
 	// 
@@ -53,11 +84,18 @@ var Router = module.exports = AppObject.extend({
 	// 
 	// @return void
 	// 
-	on: function() {
+	start: function() {
 		if (! this._isOn) {
 			this._isOn = true;
 			cloak.$win.on('statechange', this._onstatechange);
+
+			// When we start a router, we trigger a statechange event. This shouldn't
+			// cause any issues, though, as we ignore statechanges that have the same url as
+			// the current one
+			cloak.$win.trigger('statechange');
 		}
+
+		return this;
 	},
 
 	// 
@@ -65,11 +103,13 @@ var Router = module.exports = AppObject.extend({
 	// 
 	// @return void
 	// 
-	off: function() {
+	stop: function() {
 		if (this._isOn) {
 			this._isOn = false;
 			cloak.$win.off('statechange', this._onstatechange);
 		}
+
+		return this;
 	},
 
 	// 
@@ -127,8 +167,13 @@ var Router = module.exports = AppObject.extend({
 	// 
 	handleAnchor: function(evt) {
 		evt.preventDefault();
+
+		var target = evt.target;
+		while (target.tagName !== 'A' && target !== document.body) {
+			target = target.parentNode;
+		}
 		
-		var href = evt.target.getAttribute('href');
+		var href = target.getAttribute('href');
 		while (href.charAt(0) === '/' || href.charAt(0) === '#') {
 			href = href.slice(1);
 		}
@@ -148,6 +193,10 @@ var Router = module.exports = AppObject.extend({
 	// @return void
 	// 
 	_parseRoute: function(uri, method) {
+		if (typeof this[method] !== 'function') {
+			throw new Error('Router: cannot bind URI "' + uri + '" to missing method "' + method + '"');
+		}
+
 		this.bind(method);
 
 		var result = {
@@ -162,6 +211,7 @@ var Router = module.exports = AppObject.extend({
 		});
 		this._variablePattern.lastIndex = 0;
 
+		result.regex += (result.regex.slice(-1) === '/') ? '?' : '/?';
 		result.regex = new RegExp('^' + result.regex + '$');
 
 		this._routes.push(result);
@@ -174,6 +224,12 @@ var Router = module.exports = AppObject.extend({
 	// @return object
 	// 
 	_find: function(href) {
+		// Make sure to cut off any query string before matching
+		href = href.split('?')[0];
+
+		// If there is a hash, remove it before matching
+		href = href.replace('#', '');
+
 		for (var i = 0, c = this._routes.length; i < c; i++) {
 			var route = this._routes[i];
 			var match = route.regex.exec(href);
@@ -219,9 +275,18 @@ var Router = module.exports = AppObject.extend({
 		};
 
 		// If the currently tracked url is the one we're already on, emit an event and move on
-		if (state.hash === this._currentUrl) {
-			this.emit('reload', this._currentRoute.params, this._currentRoute.href, data);
-			return;
+		if (state.hash === this.topLevel._currentUrl) {
+			if (this._currentRoute) {
+				var params = this._currentRoute.params;
+				var href = this._currentRoute.href;
+			}
+			this.emit('reload', params, href, data);
+			return true;
+		}
+
+		if (this._opts.isTopLevel) {
+			this.emit('statechange', state);
+			cloak.log('State Change: ' + state.hash);
 		}
 
 		this._currentUrl = state.hash;
@@ -229,10 +294,43 @@ var Router = module.exports = AppObject.extend({
 
 		// Handle unrecognized routes
 		if (! this._currentRoute) {
-			return this.emit('notfound', state);
+			if (! this._deferToSubRouters()) {
+				this.emit('notfound', state);
+				return false;
+			}
+			return true;
 		}
 		
+		
 		this._currentRoute.func(this._currentRoute.params, this._currentRoute.href, data);
+		return true;
+	},
+
+	// 
+	// Checks any listed sub-routers for a match
+	// 
+	// @return void
+	// 
+	_deferToSubRouters: function() {
+		var temp = this._currentUrl;
+		this._currentUrl = null;
+
+		var sub = _.find(this._subRouters, function(subRouter) {
+			return subRouter._onstatechange();
+		});
+
+		this._currentUrl = temp;
+
+		if (sub) {
+			this._currentRoute = sub._currentRoute;
+		}
+
+		return !! sub;
 	}
 
 });
+
+// 
+// Expose the default config object
+// 
+Router.defaults = defaults;

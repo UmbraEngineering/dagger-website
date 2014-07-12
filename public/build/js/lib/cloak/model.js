@@ -3,7 +3,6 @@
  
 var cloak       = require('cloak');
 var AppObject   = require('cloak/app-object');
-var Collection  = require('cloak/collection');
 var _           = require('cloak/underscore');
 var $           = require('jquery');
 
@@ -81,7 +80,7 @@ var Model = module.exports = AppObject.extend(modelStore.methods, {
 					scopeAttrs = scopeAttrs.call(this);
 				}
 				// Extend the building attributes object with the new attributes
-				attrs = _.extend(scopeAttrs, attrs);
+				attrs = _.extend(attrs, scopeAttrs);
 			}
 		}
 		// Work our way up the prototype chain..
@@ -398,7 +397,7 @@ var Model = module.exports = AppObject.extend(modelStore.methods, {
 
 			// If the # notation is used, load the model ID with the .id() method
 			else if ($1 === '#') {
-				value += self.id();
+				value += self.id() || '';
 			}
 
 			// Otherwise, replace it with the attribute from .get(attr)
@@ -554,6 +553,14 @@ var Model = module.exports = AppObject.extend(modelStore.methods, {
 	}
 
 });
+
+// --------------------------------------------------------
+
+// 
+// We have to require this module down here to avoid problems with circular module
+// resolutions causing things to not be defined.
+// 
+var Collection  = require('cloak/collection');
 
 // --------------------------------------------------------
 

@@ -4,6 +4,7 @@
 require('./prism');
 require('./bash');
 require('./http');
+require('./folders');
 
 module.exports = Prism;
 

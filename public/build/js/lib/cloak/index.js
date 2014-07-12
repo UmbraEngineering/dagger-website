@@ -63,7 +63,10 @@ exports.config = {
 	modelStore: null,
 
 	// Should models be removed from collections automatically when deleted?
-	removeFromCollectionOnDelete: true
+	removeFromCollectionOnDelete: true,
+
+	// The default tag name for view elements
+	viewTag: 'div'
 };
 
 // 

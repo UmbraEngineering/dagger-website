@@ -33,17 +33,5 @@ function highlight(elem, second) {
 	});
 
 	return deferred;
-}
-
-// 
-// Add a handlebars helper for easily embedding source code
-// 
-handlebars.registerHelper('highlight', function(lang, opts) {
-	var source = opts.fn(this);
-	while (source.indexOf('<') >= 0) {
-		source = source.replace('<', '&lt;');
-	}
-	return '<pre><code class="language-' + lang + '">' + source + '</code></pre>';
-});
- 
+} 
  }; /* ==  End source for module /views/_highlight.js  == */ return module; }());;

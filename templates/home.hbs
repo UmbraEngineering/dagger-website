@@ -1,0 +1,113 @@
+<div class="row content">
+	<p class="intro">
+		Dagger is a <a href="http://nodejs.org">Node.js</a> RESTful API framework with built-in websocket support, built on top of
+		well known and trusted tools like <a href="http://expressjs.com/">Express.js</a>, <a href="http://socket.io/">Socket.io</a>,
+		and <a href="http://www.mongodb.org/">MongoDB</a> / <a href="http://mongoosejs.com/">Mongoose</a>.
+	</p>
+
+	<h2>Getting Started</h2>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				First things first, install the Dagger CLI scaffolding tool from npm.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ [sudo] npm install -g dagger-cli
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				Once the tool is installed, create a directory for your new project
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ mkdir your-project && cd your-project
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				Next, initialize your new dagger project!
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger init --deps
+			{{/pre}}
+		</div>
+	</div>
+	
+
+	
+
+	{{!-- <p>
+		From there, you can create a new project and get up running with just a couple commands.
+	</p>
+
+	{{#pre "bash"}}
+		$ mkdir your-project
+		$ cd your-project
+
+		# Create a new dagger project and install dependencies
+		$ dagger init --deps
+
+		# Now, let's create an endpoint
+		$ dagger create endpoint test
+	{{/pre}}
+
+	<p>
+		You should now have the following in the <code>your-project</code> directory.
+	</p>
+
+	<dl class="files">
+		<dt><code>app.js</code></dt>
+		<dd>
+			This file starts up your application. You can add entries to this file for middlewares and bootstrapping
+			modules.
+		</dd>
+
+		<dt><code>package.json</code></dt>
+		<dd>
+			Describes your application and it's dependencies. More info about <code>package.json</code> files can be
+			found on the <a href="https://www.npmjs.org/doc/package.json.html">NPM website</a>.
+		</dd>
+
+		<dt><code>config</code></dt>
+		<dd>
+			This directory contains your configuration files. The <code>master.js</code> file is the base configuration,
+			then you have one other file for each environment (<code>development.js</code> and <code>production.js</code>).
+		</dd>
+
+		<dt><code>bootstrap</code></dt>
+		<dd>
+			This directory is for bootstrapping modules which run at app start up.
+		</dd>
+
+		<dt><code>middlewares</code></dt>
+		<dd>
+			This directory is for middleware modules that run for each incoming request.
+		</dd>
+
+		<dt><code>models</code></dt>
+		<dd>
+			This directory is for your models definitions. Each file contains a mongoose schema along with any methods
+			you want to define for the model.
+		</dd>
+
+		<dt><code>endpoints</code></dt>
+		<dd>
+			This directory is for your endpoint definitions. Each file defines an <code>Endpoint</code> instance which
+			defines how the server is to respond to different types of requests at the given path. The endpoint we created
+			above will be stored in this directory as <code>test.js</code>.
+		</dd>
+	</dl> --}}
+</div>

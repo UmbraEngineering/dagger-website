@@ -6,347 +6,98 @@ Handlebars = glob.Handlebars || require('handlebars');
 
 this["exports"] = this["exports"] || {};
 
-this["exports"]["footer"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+this["exports"]["getting-started"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   
 
 
-  return "<footer>\n	<p>\n		Copyright &copy; 2014 <a href=\"http://www.umbraengineering.com\">Umbra Engineering LLC</a>\n	</p>\n	<p>\n		Dagger.js is dual licensed under MIT and GPL\n	</p>\n</footer>";
+  return "<h1>Dagger.js</h1>\n<div class=\"row content\">\n	\n</div>\n";
   });
 
-this["exports"]["get-started"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+this["exports"]["home"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, options, self=this, helperMissing=helpers.helperMissing;
+  var buffer = "", stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
 
 function program1(depth0,data) {
   
   
-  return "\n$ npm install -g dagger-cli\n# Optional, install the bash completion scripts\n$ dagger completion install\n";
+  return "\n				$ [sudo] npm install -g dagger-cli\n			";
   }
 
 function program3(depth0,data) {
   
   
-  return "\n$ npm install --save dagger.js\n";
+  return "\n				$ mkdir your-project && cd your-project\n			";
   }
 
 function program5(depth0,data) {
   
   
-  return "\n$ mkdir my-project\n$ cd my-project\n";
+  return "\n				$ dagger init --deps\n			";
   }
 
-function program7(depth0,data) {
-  
-  
-  return "\n$ dagger init --deps\n";
-  }
-
-function program9(depth0,data) {
-  
-  
-  return "\n$ dagger create endpoint hello --method get\n";
-  }
-
-function program11(depth0,data) {
-  
-  
-  return "\nvar Endpoint   = require('dagger.js/lib/endpoint');\nvar HttpError  = require('dagger.js/lib/http-meta').HttpError;\n\nvar HelloEndpoint = module.exports = new Endpoint({\n\n	route: '/hello',\n	\n	//\n	// GET /hello\n	//\n	\"get\": function(req) {\n		(new HttpError(405, 'Endpoint not configured')).send(req);\n	}\n	\n});\n";
-  }
-
-function program13(depth0,data) {
-  
-  
-  return "\n$ dagger create model person --fields name,email\n";
-  }
-
-function program15(depth0,data) {
-  
-  
-  return "\nvar models = require('dagger.js/lib/models');\n\n\n// \n// Define the Person schema\n// \n// There is no need to create the actual model here (eg. `mongoose.model('Person', PersonSchema)`)\n// as that is handled automatically by dagger's model module.\n// \nvar PersonSchema = module.exports = new models.Schema({\n	name: { type: String },\n	email: { type: String }\n});\n";
-  }
-
-  buffer += "<h2>Install</h2>\n<p>\n	Dagger has a <abbr title=\"Command Line Interface\">CLI</abbr> scaffolding tool to help you create and build\n	your projects which can be found in the <abbr title=\"Node Package Manager\">NPM</abbr> repository.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "bash", options) : helperMissing.call(depth0, "highlight", "bash", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	If you don't want to use the scaffolding tool, you can also install Dagger directly in your project directory, but\n	it is highly recommended to use the scaffolding tool.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "bash", options) : helperMissing.call(depth0, "highlight", "bash", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h3>Using The Scaffolding Tool</h3>\n<p>\n	Using the scaffolding tool is very easy and straight-forward. To begin with, you will need a directory to\n	work in.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "bash", options) : helperMissing.call(depth0, "highlight", "bash", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	From here, we can use the scaffold to initialize all of the basics of a Dagger application.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "bash", options) : helperMissing.call(depth0, "highlight", "bash", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	The <code>init</code> command tells the tool to create all the basic directories and files needed for\n	a Dagger application, such as the <code>package.json</code> file, the main <code>app.js</code> file,\n	and the <code>models</code> and <code>endpoints</code> directories. Adding the <code>--deps</code>\n	flag tells it to also call to npm to install the project dependencies. Now we can create our first endpoint.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "bash", options) : helperMissing.call(depth0, "highlight", "bash", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	This will create a new file <code>endpoints/hello.js</code> with a basic endpoint that responds to the\n	<code>GET</code> method. It should look something like this:\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h4>Creating Models</h4>\n<p>\n	Now, let's create a model and an endpoint to access that model.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "bash", options) : helperMissing.call(depth0, "highlight", "bash", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	This will result in the file <code>models/person.js</code> that looks something like this:\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(15, program15, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n\n\n\n\n\n\n\n\n\n";
+  buffer += "<div class=\"row content\">\n	<p class=\"intro\">\n		Dagger is a <a href=\"http://nodejs.org\">Node.js</a> RESTful API framework with built-in websocket support, built on top of\n		well known and trusted tools like <a href=\"http://expressjs.com/\">Express.js</a>, <a href=\"http://socket.io/\">Socket.io</a>,\n		and <a href=\"http://www.mongodb.org/\">MongoDB</a> / <a href=\"http://mongoosejs.com/\">Mongoose</a>.\n	</p>\n\n	<h2>Getting Started</h2>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-6 medium-push-6 columns\">\n			<p>\n				First things first, install the Dagger CLI scaffolding tool from npm.\n			</p>\n		</div>\n		<div class=\"small-12 medium-6 medium-pull-6 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-6 medium-push-6 columns\">\n			<p>\n				Once the tool is installed, create a directory for your new project\n			</p>\n		</div>\n		<div class=\"small-12 medium-6 medium-pull-6 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-6 medium-push-6 columns\">\n			<p>\n				Next, initialize your new dagger project!\n			</p>\n		</div>\n		<div class=\"small-12 medium-6 medium-pull-6 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n	\n\n	\n\n	\n</div>\n";
   return buffer;
   });
 
-this["exports"]["header"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
+this["exports"]["layouts.index"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
-
-
-  return "<header>\n	<h1><a href=\"/#welcome\">Dagger.js</a></h1>\n	<p>\n		A Node.js REST API framework with built-in websocket support\n	</p>\n</header>\n<nav>\n	<a href=\"/#intro\">Intro</a>\n	<a href=\"/#get-started\">Getting Started</a>\n	<a href=\"/#examples\">Examples</a>\n	<a href=\"/#docs\">Documentation</a>\n</nav>";
-  });
-
-this["exports"]["intro"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, options, self=this, helperMissing=helpers.helperMissing;
+  var buffer = "", stack1, helper, functionType="function", self=this;
 
 function program1(depth0,data) {
   
-  
-  return "\nvar models = require('dagger.js/lib/models');\n\nvar ObjectId  = models.types.ObjectId;\n\n//\n// Define a new Person schema\n//\nvar PersonSchema = module.exports = new models.Schema({\n	name: String,\n	email: {type: String, index: {unique: true}},\n	gender: {type: String, enum: ['male', 'female', 'other', 'undisclosed']},\n	children: [{type: ObjectId, ref: 'person'}]\n});\n\n//\n// Add a new method to our model\n//\nPersonSchema.methods.sendEmail = function(opts) {\n	sendEmail(this.email, opts);\n};\n";
+  var stack1;
+  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.wrapper)),stack1 == null || stack1 === false ? stack1 : stack1[0])),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
+  if(stack1 || stack1 === 0) { return stack1; }
+  else { return ''; }
   }
 
 function program3(depth0,data) {
   
-  
-  return "\nvar Endpoint = require('dagger.js/lib/endpoint');\n\n//\n// Define the new endpoint\n//\nvar PeopleEndpoint = module.exports = new Endpoint({\n\n	route: '/people',\n\n	//\n	// GET /people\n	//\n	'get': function(req) {\n		req.respond(200, 'Hello World!');\n	},\n\n	//\n	// GET /people/:id\n	//\n	'get /:id': function(req) {\n		req.respond(200, 'You attempted to fetch ' + req.params.id);\n	},\n\n	//\n	// POST /people\n	//\n	'post': function(req) {\n		req.respond(405, 'We don\\'t support POSTs on this endpoint');\n	},\n\n	//\n	// PUT /people/:id\n	// PATCH /people/:id\n	//\n	'put|patch /:id': function(req) {\n		req.respond(200, 'We handle PUT and PATCH requests with the same code');\n	},\n\n	//\n	// DELETE /people\n	//\n	'delete': function(req) {\n		req.respond(200, 'No! D: Don\\'t delete me! :(');\n	}\n\n});\n";
+  var stack1;
+  stack1 = ((stack1 = ((stack1 = (depth0 && depth0.wrapper)),stack1 == null || stack1 === false ? stack1 : stack1[1])),typeof stack1 === functionType ? stack1.apply(depth0) : stack1);
+  if(stack1 || stack1 === 0) { return stack1; }
+  else { return ''; }
   }
 
 function program5(depth0,data) {
   
   
-  return "\n$ dagger create endpoint people for person\nCreating new endpoint \"people\" for model \"person\"... Done.\n";
+  return ".min";
   }
 
-function program7(depth0,data) {
-  
-  
-  return "\nGET http://example.com/people/schema HTTP/1.1\n";
-  }
-
-function program9(depth0,data) {
-  
-  
-  return "\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n	\"_id\": {\n		\"type\": \"ObjectId\",\n		\"auto\": true\n	},\n	\"name\": {\n		\"type\": \"String\"\n	},\n	\"email\": {\n		\"type\": \"Email\",\n		\"unique\": true\n	},\n	\"gender\": {\n		\"type\": \"String\",\n		\"enum\": [\"male\", \"female\", \"other\", \"undisclosed\"]\n	},\n	\"children\": {\n		\"type\": \"[ObjectId]\",\n		\"ref\": \"person\"\n	}\n}\n";
-  }
-
-function program11(depth0,data) {
-  
-  
-  return "\nGET http://example.com/people?filter={\"gender\":\"male\"}&amp;populate=children HTTP/1.1\n";
-  }
-
-function program13(depth0,data) {
-  
-  
-  return "\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n[{\n	\"_id\": \"...\",\n	\"name\": \"Bob\",\n	\"email\": \"bob@example.com\",\n	\"gender\": \"male\",\n	\"children\": [{\n		\"_id\": \"...\"\n		\"name\": \"Sally\",\n		\"email\": \"sally@example.com\",\n		\"gender\": \"female\",\n		\"children\": []\n	}]\n}]\n";
-  }
-
-function program15(depth0,data) {
-  
-  
-  return "\nPATCH http://example.com/people HTTP/1.1\nContent-Type: application/json\n\n[\n	{\"_id\":\"...\",\"name\":\"Bob\"},\n	{\"_id\":\"...\",\"name\":\"Sally\"}\n]\n";
-  }
-
-function program17(depth0,data) {
-  
-  
-  return "\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n[{\n	\"_id\": \"...\",\n	\"name\": \"Bob\",\n	\"email\": \"bob@example.com\",\n	\"gender\": \"Male\",\n	\"children\": [\"...\"]\n}, {\n	\"_id\": \"...\",\n	\"name\": \"Sally\",\n	\"email\": \"sally@example.com\",\n	\"gender\": \"Female\",\n	\"children\": []\n}]\n";
-  }
-
-function program19(depth0,data) {
-  
-  
-  return "\nvar socket = io.connect('http://example.com');\n\nvar req = {\n	method: 'get',\n	url: '/people?filter={\"name\":\"Bob\"}'\n};\n\n// Using the socket.io client to make requests\nsocket.emit('request', req, function(res) {\n	var bob = res.body;\n});\n";
-  }
-
-function program21(depth0,data) {
-  
-  
-  return "\nvar socket = io.connect('http://example.com');\n\nvar req = {\n	model: 'person',\n	event: 'create',\n	filter: {gender: 'female'}\n};\n\n// Set-up the listener on the server\nsocket.emit('listen', req, function(res) {\n	// Start listening for incoming events\n	socket.on(res.emits, function(person) {\n		console.log('A new person with gender \"female\" was created on the server.');\n	});\n});\n";
-  }
-
-  buffer += "<p>\n	Dagger.js is a new RESTful API framework for Node.js packed full of power, built on top of known\n	and trusted libraries like <a href=\"http://expressjs.com\">Express</a>, <a href=\"http://socket.io\">\n	Socket.IO</a>, and <a href=\"http://mongoosejs.com/\">Mongoose</a>.\n</p>\n\n\n\n<h2>Mongoose Models with Added Extras</h2>\n<p>\n	Dagger.js models use mongoose under the hood, but has extended it for ease of use and added\n	some extra features.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n\n\n<h2>Easy-to-use Endpoints</h2>\n<p>\n	The built-in endpoint class is very easy to use. You just create a new endpoint instance with a base route\n	and define methods/sub-routes.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	For basic model endpoints, you don't have to write most of this yourself, you can use the <abbr\n	title=\"Command Line Interface\">CLI</abbr> scaffolding tool to create endpoints for your models\n	automatically. These auto-generated endpoints have a lot of built-in advantages.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "bash", options) : helperMissing.call(depth0, "highlight", "bash", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h3>Schema Endpoints</h3>\n<p>\n	Auto-generated endpoints will automatically create schema endpoints for you models so your API will\n	document itself.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h3>Filters and Populates</h3>\n<p>\n	You can pass in mongodb style filter queries to your model endpoints, as well as specifying fields to\n	be populated when querying.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h3>Bulk Updates and Deletes</h3>\n<p>\n	Model endpoints also support bulk updates and deletes so you can design you code to be more efficient.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(15, program15, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(17, program17, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n\n\n<h2>Socket.IO Out of the Box</h2>\n<p>\n	Socket.IO is deeply integrated into Dagger.js; Any request that you can make with a REST endpoint\n	can also be done through a websocket.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(19, program19, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	You can also use Socket.IO to create push-based applications in Dagger.js by having the client listen\n	for events on specific models:\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(21, program21, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n";
-  return buffer;
-  });
-
-this["exports"]["not-found"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "";
-
-
-  return buffer;
-  });
-
-this["exports"]["welcome"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
-  this.compilerInfo = [4,'>= 1.0.0'];
-helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  var buffer = "", stack1, stack2, options, self=this, helperMissing=helpers.helperMissing;
-
-function program1(depth0,data) {
-  
-  
-  return "\nvar models = require('dagger.js/lib/models');\n\nvar Email     = models.types.Email;\nvar ObjectId  = models.types.ObjectId;\n\n//\n// Define a new Person schema\n//\nvar PersonSchema = module.exports = {\n	name: String,\n	email: {type: Email, index: {unique: true}},\n	gender: {type: String, enum: ['male', 'female', 'other', 'undisclosed']},\n	children: [{type: ObjectId, ref: 'person'}]\n};\n";
-  }
-
-function program3(depth0,data) {
-  
-  
-  return "\nvar Endpoint = require('dagger.js/lib/endpoint');\n\n//\n// Define the new endpoint\n//\nvar PeopleEndpoint = module.exports = Endpoint.create({\n\n	route: '/people',\n\n	'get': function(req) {\n		req.respond(200, 'Hello World!');\n	},\n\n	'get /:id': function(req) {\n		req.respond(200, You attempted to fetch ' + req.params.id);\n	},\n\n	'post': function(req) {\n		req.respond(405, 'We don't support POSTs on this endpoint');\n	},\n\n	'put|patch': function(req) {\n		req.respond(200, 'We handle PUT and PATCH requests with the same code');\n	},\n\n	'del': function(req) {\n		req.respond(200, 'No! D: Don't delete me! :(');\n	}\n\n});\n";
-  }
-
-function program5(depth0,data) {
-  
-  
-  return "\nGET http://example.com/people/schema HTTP/1.1\n";
-  }
-
-function program7(depth0,data) {
-  
-  
-  return "\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n{\n	\"_id\": {\n		\"type\": \"ObjectId\",\n		\"auto\": true\n	},\n	\"name\": {\n		\"type\": \"String\"\n	},\n	\"email\": {\n		\"type\": \"Email\",\n		\"unique\": true\n	},\n	\"gender\": {\n		\"type\": \"String\",\n		\"enum\": [\"Male\", \"Female\", \"Other\", \"Undisclosed\"]\n	},\n	\"children\": {\n		\"type\": \"[ObjectId]\",\n		\"ref\": \"Person\"\n	}\n}\n";
-  }
-
-function program9(depth0,data) {
-  
-  
-  return "\nGET http://example.com/people?filter={\"gender\":\"Male\"}&amp;populate=children HTTP/1.1\n";
-  }
-
-function program11(depth0,data) {
-  
-  
-  return "\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n[{\n	\"_id\": \"...\",\n	\"name\": \"Bob\",\n	\"email\": \"bob@example.com\",\n	\"gender\": \"Male\",\n	\"children\": [{\n		\"_id\": \"...\"\n		\"name\": \"Sally\",\n		\"email\": \"sally@example.com\",\n		\"gender\": \"Female\",\n		\"children\": []\n	}]\n}]\n";
-  }
-
-function program13(depth0,data) {
-  
-  
-  return "\nPATCH http://example.com/people HTTP/1.1\nContent-Type: application/json\n\n[\n	{\"_id\":\"...\",\"name\":\"Bob\"},\n	{\"_id\":\"...\",\"name\":\"Sally\"}\n]\n";
-  }
-
-function program15(depth0,data) {
-  
-  
-  return "\nHTTP/1.1 200 OK\nContent-Type: application/json\n\n[{\n	\"_id\": \"...\",\n	\"name\": \"Bob\",\n	\"email\": \"bob@example.com\",\n	\"gender\": \"Male\",\n	\"children\": [\"...\"]\n}, {\n	\"_id\": \"...\",\n	\"name\": \"Sally\",\n	\"email\": \"sally@example.com\",\n	\"gender\": \"Female\",\n	\"children\": []\n}]\n";
-  }
-
-function program17(depth0,data) {
-  
-  
-  return "\nvar socket = io.connect('http://example.com');\n\n// Using the socket.io client to make requests\nsocket.emit('request', {method: 'get', url: '/people?filter={\"name\":\"Bob\"}'}, function(res) {\n	var bob = res.body;\n});\n";
-  }
-
-function program19(depth0,data) {
-  
-  
-  return "\nvar socket = io.connect('http://example.com');\n\n// Using socket.io client to listen for events on the server\nsocket.emit('listen', {model: 'person', event: 'create', filter: {gender: 'female'}}, function(res) {\n	socket.on(res.emits, function(person) {\n		console.log('A new person with gender \"female\" was created on the server.');\n	});\n});\n";
-  }
-
-  buffer += "<p>\n	Dagger.js is a new RESTful API framework for Node.js packed full of power, built on top of known\n	and trusted libraries like <a href=\"http://expressjs.com\">Express</a>, <a href=\"http://socket.io\">\n	Socket.IO</a>, and <a href=\"http://mongoosejs.com/\">Mongoose</a>.\n</p>\n\n\n\n<h2>Mongoose Models with Added Extras</h2>\n<p>\n	Dagger.js models use mongoose under the hood, but has extended it for ease of use and added\n	some extra features.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n\n\n<h2>Easy-to-use Endpoints</h2>\n<p>\n	The built-in endpoint class is very easy to use.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h3>Schema Endpoints</h3>\n<p>\n	Auto-generated endpoints will automatically create schema endpoints for you models so your API will\n	document itself.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h3>Filters and Populates</h3>\n<p>\n	You can pass in mongodb style filter queries to your model endpoints, as well as specifying fields to\n	be populated when querying.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<h3>Bulk Updates and Deletes</h3>\n<p>\n	Model endpoints also support bulk updates and deletes so you can design you code to be more efficient.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(15, program15, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "http", options) : helperMissing.call(depth0, "highlight", "http", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n\n\n<h2>Socket.IO Out of the Box</h2>\n<p>\n	Socket.IO is deeply integrated into Dagger.js; Any request that you can make with a REST endpoint\n	can also be done through a websocket.\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(17, program17, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n\n<p>\n	You can also use Socket.IO to create push-based applications in Dagger.js by having the client listen\n	for events on specific models:\n</p>\n\n";
-  options = {hash:{},inverse:self.noop,fn:self.program(19, program19, data),data:data};
-  stack2 = ((stack1 = helpers.highlight || (depth0 && depth0.highlight)),stack1 ? stack1.call(depth0, "javascript", options) : helperMissing.call(depth0, "highlight", "javascript", options));
-  if(stack2 || stack2 === 0) { buffer += stack2; }
-  buffer += "\n";
+  buffer += "<!doctype html>\n<html>\n<head>\n	\n	<meta charset=\"utf-8\" />\n	<title>Dagger.js</title>\n\n	<link rel=\"stylesheet\" type=\"text/css\" href=\"/fonts/district-thin/stylesheet.css\" />\n	<link rel=\"stylesheet\" type=\"text/css\" href=\"/build/css/styles.min.css\" />\n\n</head>\n<body>\n\n	<div id=\"wrapper\">\n		<div id=\"header\">\n			<h1><a href=\"/#\">Dagger.js</a></h1>\n			<nav>\n				<ul>\n					<li><a href=\"/#docs\">Documentation</a></li>\n					<li><a href=\"https://github.com/UmbraEngineering/dagger\">GitHub</a></li>\n					<li><a href=\"https://github.com/UmbraEngineering/dagger/issues\">Issues</a></li>\n				</ul>\n			</nav>\n		</div>\n		<div id=\"content\">\n			";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.wrapper), {hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			";
+  if (helper = helpers.body) { stack1 = helper.call(depth0, {hash:{},data:data}); }
+  else { helper = (depth0 && depth0.body); stack1 = typeof helper === functionType ? helper.call(depth0, {hash:{},data:data}) : helper; }
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.wrapper), {hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n	\n	<script src=\"/build/js/common";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.production), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ".js\"></script>\n	<script src=\"/build/js/lib";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.production), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ".js\"></script>\n	<script src=\"/build/js/app";
+  stack1 = helpers['if'].call(depth0, (depth0 && depth0.production), {hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data});
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += ".js\"></script>\n\n	<script>\n\n		// Set the require paths\n		require.paths.push('/lib', '/vendor');\n\n		// Use <section> elements for views\n		require('cloak').config.viewTag = 'section';\n\n		// Load JSON polyfill if needed\n		JSON || require('json2');\n\n		// Load our handlebars helpers\n		require('helpers.handlebars');\n\n		// Load the router\n		var Router = require('routers/main');\n		var router = new Router({ autoStart: false })\n			.use(require('routers/docs'))\n			.start();\n\n	</script>\n\n</body>\n</html>";
   return buffer;
   });
 
@@ -387,56 +138,20 @@ function highlight(elem, second) {
 	});
 
 	return deferred;
-}
-
-// 
-// Add a handlebars helper for easily embedding source code
-// 
-handlebars.registerHelper('highlight', function(lang, opts) {
-	var source = opts.fn(this);
-	while (source.indexOf('<') >= 0) {
-		source = source.replace('<', '&lt;');
-	}
-	return '<pre><code class="language-' + lang + '">' + source + '</code></pre>';
-});
- 
+} 
  }; /* ==  End source for module /views/_highlight.js  == */ return module; }());;
-;require._modules["/views/footer.js"] = (function() { var __filename = "/views/footer.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /views/footer.js  == */ var __module__ = function() { 
+;require._modules["/views/getting-started.js"] = (function() { var __filename = "/views/getting-started.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /views/getting-started.js  == */ var __module__ = function() { 
  
-var $              = require('jquery');
-var templates      = require('templates');
-var View           = require('cloak/view');
-
-var FooterView = module.exports = View.extend({
-
-	template: templates['footer'],
-
-	initialize: function() {
-		this.$elem = $('#footer');
-	},
-
-	draw: function() {
-		this.$elem.html(this.render({
-			year: (new Date()).getFullYear()
-		}));
-	}
-
-});
- 
- }; /* ==  End source for module /views/footer.js  == */ return module; }());;
-;require._modules["/views/get-started.js"] = (function() { var __filename = "/views/get-started.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /views/get-started.js  == */ var __module__ = function() { 
- 
-var templates  = require('templates');
-var View       = require('cloak/view');
+var templates   = require('templates');
+var View        = require('cloak/view');
 
 require('./_highlight');
 
-var GetStartedView = module.exports = View.extend({
+var GettingStartedView = module.exports = View.extend({
 
-	className: 'get-started',
-	template: templates['get-started'],
+	className: 'getting-started',
+	template: templates['getting-started'],
 
 	events: {
 		// 
@@ -448,48 +163,28 @@ var GetStartedView = module.exports = View.extend({
 
 	draw: function() {
 		this.$elem.html(this.render());
+		this.afterDraw();
+	},
 
-		this.bindEvents();
+	afterDraw: function() {
 		this.highlight();
 	}
 
 });
  
- }; /* ==  End source for module /views/get-started.js  == */ return module; }());;
-;require._modules["/views/header.js"] = (function() { var __filename = "/views/header.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /views/header.js  == */ var __module__ = function() { 
+ }; /* ==  End source for module /views/getting-started.js  == */ return module; }());;
+;require._modules["/views/home.js"] = (function() { var __filename = "/views/home.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /views/home.js  == */ var __module__ = function() { 
  
-var $              = require('jquery');
-var templates      = require('templates');
-var View           = require('cloak/view');
-
-var HeaderView = module.exports = View.extend({
-
-	template: templates['header'],
-
-	initialize: function() {
-		this.$elem = $('#header');
-	},
-
-	draw: function() {
-		this.$elem.html(this.render());
-	}
-
-});
- 
- }; /* ==  End source for module /views/header.js  == */ return module; }());;
-;require._modules["/views/intro.js"] = (function() { var __filename = "/views/intro.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /views/intro.js  == */ var __module__ = function() { 
- 
-var templates  = require('templates');
-var View       = require('cloak/view');
+var templates   = require('templates');
+var View        = require('cloak/view');
 
 require('./_highlight');
 
-var IntroView = module.exports = View.extend({
+var HomeView = module.exports = View.extend({
 
-	className: 'intro',
-	template: templates['intro'],
+	className: 'home',
+	template: templates['home'],
 
 	events: {
 		// 
@@ -501,194 +196,133 @@ var IntroView = module.exports = View.extend({
 
 	draw: function() {
 		this.$elem.html(this.render());
+		this.afterDraw();
+	},
 
-		this.bindEvents();
+	afterDraw: function() {
 		this.highlight();
 	}
 
 });
  
- }; /* ==  End source for module /views/intro.js  == */ return module; }());;
-;require._modules["/views/not-found.js"] = (function() { var __filename = "/views/not-found.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /views/not-found.js  == */ var __module__ = function() { 
- 
-var templates  = require('templates');
-var View       = require('cloak/view');
-
-var NotFoundView = module.exports = View.extend({
-
-	className: '404 center-panel',
-	template: templates['not-found'],
-
-	draw: function() {
-		this.$elem.html(this.render({
-			isLoggedIn: !! cloak.auth.user
-		}));
-	}
-
-});
- 
- }; /* ==  End source for module /views/not-found.js  == */ return module; }());;
-;require._modules["/views/spinner.js"] = (function() { var __filename = "/views/spinner.js"; var __dirname = "/views"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /views/spinner.js  == */ var __module__ = function() { 
- 
-var jQuery   = require('jquery');
-var View     = require('cloak/view');
-
-// Load the spin.js jQuery plugin
-require('jquery.spin');
-
-var SpinnerView = module.exports = View.extend({
-
-	initialize: function(elem, preset, color) {
-		// Override the default $elem with the given one, if one is given
-		if (elem) {
-			if (! (elem instanceof jQuery)) {
-				elem = $(elem);
-			}
-			this.$elem = elem;
-		}
-
-		// Store the options to be used when creating a spinner
-		if (typeof preset === 'object' && preset) {
-			this.opts = preset;
-		} else {
-			this.preset = preset;
-			this.color = color;
-		}
-	},
-
-	drawn: false,
-
-	draw: function(preset, color) {
-		if (! this.drawn) {
-			this.spinner = this.$elem.spin(preset || this.opts || this.preset, color || this.color);
-			this.drawn = true;
-		}
-	},
-
-	undraw: function() {
-		if (this.spinner && this.drawn) {
-			this.spinner.stop();
-			this.drawn = false;
-		}
-	}
-
-});
- 
- }; /* ==  End source for module /views/spinner.js  == */ return module; }());;
-;require._modules["/routers/main.js"] = (function() { var __filename = "/routers/main.js"; var __dirname = "/routers"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /routers/main.js  == */ var __module__ = function() { 
+ }; /* ==  End source for module /views/home.js  == */ return module; }());;
+;require._modules["/routers/docs.js"] = (function() { var __filename = "/routers/docs.js"; var __dirname = "/routers"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /routers/docs.js  == */ var __module__ = function() { 
  
 var $               = require('jquery');
+var _               = require('cloak/underscore');
 var cloak           = require('cloak');
 var Router          = require('cloak/router');
-var IntroView       = require('views/intro');
-var HeaderView      = require('views/header');
-var FooterView      = require('views/footer');
-var GetStartedView  = require('views/get-started');
 
-var MainRouter = module.exports = Router.extend({
+// --------------------------------------------------------
+
+var DocsRouter = module.exports = Router.extend({
 
 	routes: {
-		'/':             'intro',
-		'/intro':        'intro',
-		'/get-started':  'getStarted',
-		'/example':      'example',
-		'/docs':         'docs'
+		'/docs':   'index'
 	},
 
 	initialize: function() {
 		this.$content = $('#content');
 
-		// Store the currently active view object here
-		this.currentView = null;
+		// Handle internal anchors with the router
+		$('#wrapper').on('click', 'a[href^="#"]:not([href="#"]), a[href^="/#"]', this.handleAnchor);
+	},
 
-		// Handle 404 errors
-		this.bind('notfound');
-		this.on('notfound', this.notfound);
+// --------------------------------------------------------
+	
+	// 
+	// "/"
+	// 
+	index: function() {
+		// 
+	}
+
+});
+ 
+ }; /* ==  End source for module /routers/docs.js  == */ return module; }());;
+;require._modules["/routers/main.js"] = (function() { var __filename = "/routers/main.js"; var __dirname = "/routers"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /routers/main.js  == */ var __module__ = function() { 
+ 
+var $                    = require('jquery');
+var _                    = require('cloak/underscore');
+var cloak                = require('cloak');
+var Router               = require('cloak/router');
+
+var HomeView             = require('views/home');
+var GettingStartedView   = require('views/getting-started');
+
+// --------------------------------------------------------
+
+var MainRouter = module.exports = Router.extend({
+
+	routes: {
+		'':                     'index',
+		'/':                    'index',
+		'/getting-started':     'gettingStarted'
+	},
+
+	initialize: function() {
+		this.$content = $('#content');
 
 		// Handle internal anchors with the router
-		$('#wrapper').on('click', 'a[href^="#"], a[href^="/#"]', this.handleAnchor);
-
-		// Draw the header/footer
-		(new HeaderView()).draw();
-		(new FooterView()).draw();
+		$('#wrapper').on('click', 'a[href^="#"]:not([href="#"]), a[href^="/#"]', this.handleAnchor);
 	},
 
 // --------------------------------------------------------
 	
 	// 
-	// "/" and "/intro"
+	// "/"
 	// 
-	intro: function() {
-		this.drawViewToContent(new IntroView());
+	index: function() {
+		this.drawPage(HomeView);
+	},
+
+	// 
+	// "/getting-started"
+	// 
+	gettingStarted: function() {
+		this.drawPage(GettingStartedView);
 	},
 
 // --------------------------------------------------------
 	
 	// 
-	// "/get-started"
+	// Draws a page with the given page view class
 	// 
-	getStarted: function() {
-		this.drawViewToContent(new GetStartedView());
-	},
+	drawPage: function(PageView, callback) {
+		// If this is an initial page load, it will have been rendered server-side, so we need
+		// to pull the content already rendered to initialize the page view
+		if (! this.currentView) {
+			var view = this.currentView = new PageView();
+			view.$elem = this.$content.children('section');
 
-// --------------------------------------------------------
-	
-	// 
-	// "/example"
-	// 
-	example: function() {
-		this.drawViewToContent(new ExampleView());
-	},
+			if (view.afterDraw) {
+				view.afterDraw();
+			}
 
-// --------------------------------------------------------
-	
-	// 
-	// "/docs"
-	// 
-	docs: function() {
-		this.drawViewToContent(new DocsView());
-	},
+			if (typeof callback === 'function') {
+				callback();
+			}
+		}
 
-// --------------------------------------------------------
-	
-	// 
-	// Handles all unknown routes
-	// 
-	notfound: function(state) {
-		this.drawViewToContent(new NotFoundView());
-	},
+		// Otherwise, we need to transition the content using a quick fade animation
+		else {
+			var $content = this.$content;
+			var current = this.currentView;
+			var next = new PageView();
+			next.draw();
 
-// --------------------------------------------------------
-
-	// 
-	// Draws a simple view instance to the content area with a small animation
-	// 
-	drawViewToContent: function(view, callback) {
-		var $content = this.$content;
-
-		// Store the view
-		this.currentView = view;
-
-		// Fade out the current content
-		$content.animate({ opacity: 0 }, 600, function() {
-			// Remove the current content
-			$content.html('');
-
-			// Draw the new view
-			view.draw();
-			view.$elem.appendTo($content);
-
-			// Fade in the new content
-			$content.animate({ opacity: 100 }, 600, function() {
-				// Call any callback that was given
-				if (callback) {
-					callback();
-				}
+			$content.animate({ opacity: 'hide' }, 300, function() {
+				current.remove();
+				$content.append(next.$elem);
+				$content.animate({ opacity: 'show' }, 300, function() {
+					if (typeof callback === 'function') {
+						callback();
+					}
+				});
 			});
-		});
+		}
 	}
 
 });

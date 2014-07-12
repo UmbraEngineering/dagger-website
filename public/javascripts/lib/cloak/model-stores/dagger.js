@@ -32,7 +32,7 @@ methods._load = function(data) {
 // @return promise
 // 
 methods._save = function(data) {
-	var method = this.id() ? 'put' : 'post';
+	var method = this.id() ? 'PUT' : 'POST';
 
 	return Request.send(method, this.reqUrl(), data).then(function(res) {
 		return res.body;
@@ -111,8 +111,8 @@ var Request = exports.Request = AppObject.extend({
 		this.headers = Request.defaultHeaders.slice();
 
 		if (this.method === 'GET') {
-			if (this.body) {
-				this.url += '?' + toQueryString(this.body);
+			if (body) {
+				this.url += '?' + toQueryString(body);
 			}
 		} else {
 			this.body = body;
@@ -132,6 +132,7 @@ var Request = exports.Request = AppObject.extend({
 			body: this.body
 		};
 
+		cloak.log('WS Request: ' + req.method.toUpperCase() + ' ' + req.url);
 		io.emit('request', req, function(res) {
 			if (res.status >= 400) {
 				return deferred.reject(res);
@@ -254,9 +255,7 @@ function toQueryString(obj, prefix) {
 	var str = [ ];
 	for (var p in obj) {
 		var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-		str.push(typeof v == "object" ?
-			serialize(v, k) :
-			encodeURIComponent(k) + "=" + encodeURIComponent(v));
+		str.push(k + '=' + (typeof v == "object" ? JSON.stringify(v) : v));
 	}
 	return str.join("&");
 }

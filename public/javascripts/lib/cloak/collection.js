@@ -110,6 +110,46 @@ var Collection = module.exports = AppObject.extend({
 	},
 
 	// 
+	// Filters the models down to those which match the given attributes
+	// 
+	// @param {attrs} the attributes to match
+	// @return array
+	// 
+	where: function(attrs) {
+		return this.filter(function(model) {
+			for (var i in attrs) {
+				if (attrs.hasOwnProperty(i)) {
+					if (model.get(i) !== attrs[i]) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		});
+	},
+
+	// 
+	// Finds the first model which matches the given attributes
+	// 
+	// @param {attrs} the attributes to match
+	// @return Model
+	// 
+	findWhere: function(attrs) {
+		return this.detect(function(model) {
+			for (var i in attrs) {
+				if (attrs.hasOwnProperty(i)) {
+					if (model.get(i) !== attrs[i]) {
+						return false;
+					}
+				}
+			}
+			
+			return true;
+		});
+	},
+
+	// 
 	// Find the model represented by the given arg in the collection
 	// 
 	// @param {what} what to look for
@@ -164,7 +204,7 @@ var Collection = module.exports = AppObject.extend({
 		}
 
 		// Get a list of viable models to add
-		models = _.map(models, this.toModel.bind(this));
+		models = _.map(models, _.bind(this.toModel, this));
 
 		// Anything we were given that is invalid will be false after running toModel
 		// above, so {_.identity} is enough to filter them out
@@ -175,7 +215,7 @@ var Collection = module.exports = AppObject.extend({
 			models = _.unique(models, function(model) {
 				return model.id();
 			});
-			models = _.reject(models, this.contains.bind(this));
+			models = _.reject(models, _.bind(this.contains, this));
 		}
 
 		// This the end of the filters, so at this point, make sure we actually
@@ -378,7 +418,7 @@ var Collection = module.exports = AppObject.extend({
 
 		return $.when.apply($, promises)
 			.then(this.emits('deleted'))
-			.then(this.empty);
+			.then(_.bind(this.empty, this));
 	},
 
 // --------------------------------------------------------

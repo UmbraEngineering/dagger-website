@@ -1392,6 +1392,46 @@ var Collection = module.exports = AppObject.extend({
 	},
 
 	// 
+	// Filters the models down to those which match the given attributes
+	// 
+	// @param {attrs} the attributes to match
+	// @return array
+	// 
+	where: function(attrs) {
+		return this.filter(function(model) {
+			for (var i in attrs) {
+				if (attrs.hasOwnProperty(i)) {
+					if (model.get(i) !== attrs[i]) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		});
+	},
+
+	// 
+	// Finds the first model which matches the given attributes
+	// 
+	// @param {attrs} the attributes to match
+	// @return Model
+	// 
+	findWhere: function(attrs) {
+		return this.detect(function(model) {
+			for (var i in attrs) {
+				if (attrs.hasOwnProperty(i)) {
+					if (model.get(i) !== attrs[i]) {
+						return false;
+					}
+				}
+			}
+			
+			return true;
+		});
+	},
+
+	// 
 	// Find the model represented by the given arg in the collection
 	// 
 	// @param {what} what to look for
@@ -1446,7 +1486,7 @@ var Collection = module.exports = AppObject.extend({
 		}
 
 		// Get a list of viable models to add
-		models = _.map(models, this.toModel.bind(this));
+		models = _.map(models, _.bind(this.toModel, this));
 
 		// Anything we were given that is invalid will be false after running toModel
 		// above, so {_.identity} is enough to filter them out
@@ -1457,7 +1497,7 @@ var Collection = module.exports = AppObject.extend({
 			models = _.unique(models, function(model) {
 				return model.id();
 			});
-			models = _.reject(models, this.contains.bind(this));
+			models = _.reject(models, _.bind(this.contains, this));
 		}
 
 		// This the end of the filters, so at this point, make sure we actually
@@ -1660,7 +1700,7 @@ var Collection = module.exports = AppObject.extend({
 
 		return $.when.apply($, promises)
 			.then(this.emits('deleted'))
-			.then(this.empty);
+			.then(_.bind(this.empty, this));
 	},
 
 // --------------------------------------------------------
@@ -1844,7 +1884,10 @@ exports.config = {
 	modelStore: null,
 
 	// Should models be removed from collections automatically when deleted?
-	removeFromCollectionOnDelete: true
+	removeFromCollectionOnDelete: true,
+
+	// The default tag name for view elements
+	viewTag: 'div'
 };
 
 // 
@@ -2052,7 +2095,7 @@ methods._load = function(data) {
 // @return promise
 // 
 methods._save = function(data) {
-	var method = this.id() ? 'put' : 'post';
+	var method = this.id() ? 'PUT' : 'POST';
 
 	return Request.send(method, this.reqUrl(), data).then(function(res) {
 		return res.body;
@@ -2131,8 +2174,8 @@ var Request = exports.Request = AppObject.extend({
 		this.headers = Request.defaultHeaders.slice();
 
 		if (this.method === 'GET') {
-			if (this.body) {
-				this.url += '?' + toQueryString(this.body);
+			if (body) {
+				this.url += '?' + toQueryString(body);
 			}
 		} else {
 			this.body = body;
@@ -2152,6 +2195,7 @@ var Request = exports.Request = AppObject.extend({
 			body: this.body
 		};
 
+		cloak.log('WS Request: ' + req.method.toUpperCase() + ' ' + req.url);
 		io.emit('request', req, function(res) {
 			if (res.status >= 400) {
 				return deferred.reject(res);
@@ -2274,9 +2318,7 @@ function toQueryString(obj, prefix) {
 	var str = [ ];
 	for (var p in obj) {
 		var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-		str.push(typeof v == "object" ?
-			serialize(v, k) :
-			encodeURIComponent(k) + "=" + encodeURIComponent(v));
+		str.push(k + '=' + (typeof v == "object" ? JSON.stringify(v) : v));
 	}
 	return str.join("&");
 }
@@ -2451,7 +2493,6 @@ methods._del = function() {
  
 var cloak       = require('cloak');
 var AppObject   = require('cloak/app-object');
-var Collection  = require('cloak/collection');
 var _           = require('cloak/underscore');
 var $           = require('jquery');
 
@@ -2529,7 +2570,7 @@ var Model = module.exports = AppObject.extend(modelStore.methods, {
 					scopeAttrs = scopeAttrs.call(this);
 				}
 				// Extend the building attributes object with the new attributes
-				attrs = _.extend(scopeAttrs, attrs);
+				attrs = _.extend(attrs, scopeAttrs);
 			}
 		}
 		// Work our way up the prototype chain..
@@ -2846,7 +2887,7 @@ var Model = module.exports = AppObject.extend(modelStore.methods, {
 
 			// If the # notation is used, load the model ID with the .id() method
 			else if ($1 === '#') {
-				value += self.id();
+				value += self.id() || '';
 			}
 
 			// Otherwise, replace it with the attribute from .get(attr)
@@ -3006,6 +3047,14 @@ var Model = module.exports = AppObject.extend(modelStore.methods, {
 // --------------------------------------------------------
 
 // 
+// We have to require this module down here to avoid problems with circular module
+// resolutions causing things to not be defined.
+// 
+var Collection  = require('cloak/collection');
+
+// --------------------------------------------------------
+
+// 
 // This function fetches the list endpoint URL for the model
 // 
 // @return string
@@ -3057,22 +3106,34 @@ var History   = require('history');
 var AppObject = require('cloak/app-object');
 var _         = require('cloak/underscore');
 
+var defaults = {
+	autoStart: true,
+	isTopLevel: true
+};
+
 // 
 // Router class
 //
 var Router = module.exports = AppObject.extend({
 
 	routes: null,
-	_routes: [ ],
+	_opts: null,
+	_routes: null,
+	_subRouters: null,
 	_isOn: false,
 	_variablePattern: /:([^\/]+)/g,
 	_currentUrl: null,
 	_currentRoute: null,
 	_isAnchor: false,
 
-	init: function() {
+	init: function(opts) {
 		this._super();
 		this._routes = [ ];
+		this._opts = _.defaults(opts || { }, Router.defaults);
+
+		if (this._opts.isTopLevel) {
+			this.topLevel = this;
+		}
 
 		_.forEach(_.keys(this.routes),
 			_.bind(
@@ -3082,23 +3143,42 @@ var Router = module.exports = AppObject.extend({
 			this)
 		);
 
+		this._subRouters = [ ];
+
 		this.bind('handleAnchor');
 
 		// Listen for history.statechange events
 		this.bind('_onstatechange');
-		if (History.enabled) {
-			this.on();
+		if (History.enabled && this._opts.autoStart) {
+			this.start();
 		}
 
 		// Call any given initialize method
 		if (typeof this.initialize === 'function') {
 			this.initialize.apply(this, arguments);
 		}
+	},
 
-		// When we initialize a new router, we trigger a statechange event. This shouldn't
-		// cause any issues, though, as we ignore statechanges that have the same url as
-		// the current one
-		cloak.$win.trigger('statechange');
+	// 
+	// Add another router's routes to this one
+	// 
+	// @param {router} the router to use
+	// @return this
+	// 
+	use: function(router) {
+		// If given a router constructor, create an instance
+		if (typeof router === 'function') {
+			router = new router({
+				autoStart: false,
+				isTopLevel: false
+			});
+		}
+
+		router.parent = this;
+		router.topLevel = this.topLevel;
+		this._subRouters.push(router);
+
+		return this;
 	},
 
 	// 
@@ -3106,11 +3186,18 @@ var Router = module.exports = AppObject.extend({
 	// 
 	// @return void
 	// 
-	on: function() {
+	start: function() {
 		if (! this._isOn) {
 			this._isOn = true;
 			cloak.$win.on('statechange', this._onstatechange);
+
+			// When we start a router, we trigger a statechange event. This shouldn't
+			// cause any issues, though, as we ignore statechanges that have the same url as
+			// the current one
+			cloak.$win.trigger('statechange');
 		}
+
+		return this;
 	},
 
 	// 
@@ -3118,11 +3205,13 @@ var Router = module.exports = AppObject.extend({
 	// 
 	// @return void
 	// 
-	off: function() {
+	stop: function() {
 		if (this._isOn) {
 			this._isOn = false;
 			cloak.$win.off('statechange', this._onstatechange);
 		}
+
+		return this;
 	},
 
 	// 
@@ -3180,8 +3269,13 @@ var Router = module.exports = AppObject.extend({
 	// 
 	handleAnchor: function(evt) {
 		evt.preventDefault();
+
+		var target = evt.target;
+		while (target.tagName !== 'A' && target !== document.body) {
+			target = target.parentNode;
+		}
 		
-		var href = evt.target.getAttribute('href');
+		var href = target.getAttribute('href');
 		while (href.charAt(0) === '/' || href.charAt(0) === '#') {
 			href = href.slice(1);
 		}
@@ -3201,6 +3295,10 @@ var Router = module.exports = AppObject.extend({
 	// @return void
 	// 
 	_parseRoute: function(uri, method) {
+		if (typeof this[method] !== 'function') {
+			throw new Error('Router: cannot bind URI "' + uri + '" to missing method "' + method + '"');
+		}
+
 		this.bind(method);
 
 		var result = {
@@ -3215,6 +3313,7 @@ var Router = module.exports = AppObject.extend({
 		});
 		this._variablePattern.lastIndex = 0;
 
+		result.regex += (result.regex.slice(-1) === '/') ? '?' : '/?';
 		result.regex = new RegExp('^' + result.regex + '$');
 
 		this._routes.push(result);
@@ -3227,6 +3326,12 @@ var Router = module.exports = AppObject.extend({
 	// @return object
 	// 
 	_find: function(href) {
+		// Make sure to cut off any query string before matching
+		href = href.split('?')[0];
+
+		// If there is a hash, remove it before matching
+		href = href.replace('#', '');
+
 		for (var i = 0, c = this._routes.length; i < c; i++) {
 			var route = this._routes[i];
 			var match = route.regex.exec(href);
@@ -3272,9 +3377,18 @@ var Router = module.exports = AppObject.extend({
 		};
 
 		// If the currently tracked url is the one we're already on, emit an event and move on
-		if (state.hash === this._currentUrl) {
-			this.emit('reload', this._currentRoute.params, this._currentRoute.href, data);
-			return;
+		if (state.hash === this.topLevel._currentUrl) {
+			if (this._currentRoute) {
+				var params = this._currentRoute.params;
+				var href = this._currentRoute.href;
+			}
+			this.emit('reload', params, href, data);
+			return true;
+		}
+
+		if (this._opts.isTopLevel) {
+			this.emit('statechange', state);
+			cloak.log('State Change: ' + state.hash);
 		}
 
 		this._currentUrl = state.hash;
@@ -3282,13 +3396,46 @@ var Router = module.exports = AppObject.extend({
 
 		// Handle unrecognized routes
 		if (! this._currentRoute) {
-			return this.emit('notfound', state);
+			if (! this._deferToSubRouters()) {
+				this.emit('notfound', state);
+				return false;
+			}
+			return true;
 		}
 		
+		
 		this._currentRoute.func(this._currentRoute.params, this._currentRoute.href, data);
+		return true;
+	},
+
+	// 
+	// Checks any listed sub-routers for a match
+	// 
+	// @return void
+	// 
+	_deferToSubRouters: function() {
+		var temp = this._currentUrl;
+		this._currentUrl = null;
+
+		var sub = _.find(this._subRouters, function(subRouter) {
+			return subRouter._onstatechange();
+		});
+
+		this._currentUrl = temp;
+
+		if (sub) {
+			this._currentRoute = sub._currentRoute;
+		}
+
+		return !! sub;
 	}
 
 });
+
+// 
+// Expose the default config object
+// 
+Router.defaults = defaults;
  
  }; /* ==  End source for module /lib/cloak/router.js  == */ return module; }());;
 ;require._modules["/lib/cloak/underscore.js"] = (function() { var __filename = "/lib/cloak/underscore.js"; var __dirname = "/lib/cloak"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
@@ -3339,7 +3486,7 @@ _.mixin({
 	// _.pick, except this excepts an array of keys
 	// 
 	pickArray: function(obj, keys) {
-		return _.pick.apply([obj].concat(keys));
+		return _.pick.apply(_, [obj].concat(keys));
 	},
 	
 	// 
@@ -3471,7 +3618,7 @@ var View = module.exports = AppObject.extend({
 		} else if (this.tagName) {
 			this.$elem = $('<' + this.tagName + '>');
 		} else {
-			this.$elem = $('<div>');
+			this.$elem = $('<' + cloak.config.viewTag + '>');
 		}
 
 		if (this.className) {
@@ -24770,9 +24917,9 @@ if (typeof define === "function" && define.amd) {
  }; /* ==  End source for module /lib/store.js  == */ return module; }());;
 ;require._modules["/lib/underscore.js"] = (function() { var __filename = "/lib/underscore.js"; var __dirname = "/lib"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
  /* ==  Begin source for module /lib/underscore.js  == */ var __module__ = function() { 
- //     Underscore.js 1.5.2
+ //     Underscore.js 1.6.0
 //     http://underscorejs.org
-//     (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     (c) 2009-2014 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
 //     Underscore may be freely distributed under the MIT license.
 
 (function() {
@@ -24837,7 +24984,7 @@ if (typeof define === "function" && define.amd) {
   }
 
   // Current version.
-  _.VERSION = '1.5.2';
+  _.VERSION = '1.6.0';
 
   // Collection Functions
   // --------------------
@@ -24846,7 +24993,7 @@ if (typeof define === "function" && define.amd) {
   // Handles objects with the built-in `forEach`, arrays, and raw objects.
   // Delegates to **ECMAScript 5**'s native `forEach` if available.
   var each = _.each = _.forEach = function(obj, iterator, context) {
-    if (obj == null) return;
+    if (obj == null) return obj;
     if (nativeForEach && obj.forEach === nativeForEach) {
       obj.forEach(iterator, context);
     } else if (obj.length === +obj.length) {
@@ -24859,6 +25006,7 @@ if (typeof define === "function" && define.amd) {
         if (iterator.call(context, obj[keys[i]], keys[i], obj) === breaker) return;
       }
     }
+    return obj;
   };
 
   // Return the results of applying the iterator to each element.
@@ -24924,10 +25072,10 @@ if (typeof define === "function" && define.amd) {
   };
 
   // Return the first value which passes a truth test. Aliased as `detect`.
-  _.find = _.detect = function(obj, iterator, context) {
+  _.find = _.detect = function(obj, predicate, context) {
     var result;
     any(obj, function(value, index, list) {
-      if (iterator.call(context, value, index, list)) {
+      if (predicate.call(context, value, index, list)) {
         result = value;
         return true;
       }
@@ -24938,33 +25086,33 @@ if (typeof define === "function" && define.amd) {
   // Return all the elements that pass a truth test.
   // Delegates to **ECMAScript 5**'s native `filter` if available.
   // Aliased as `select`.
-  _.filter = _.select = function(obj, iterator, context) {
+  _.filter = _.select = function(obj, predicate, context) {
     var results = [];
     if (obj == null) return results;
-    if (nativeFilter && obj.filter === nativeFilter) return obj.filter(iterator, context);
+    if (nativeFilter && obj.filter === nativeFilter) return obj.filter(predicate, context);
     each(obj, function(value, index, list) {
-      if (iterator.call(context, value, index, list)) results.push(value);
+      if (predicate.call(context, value, index, list)) results.push(value);
     });
     return results;
   };
 
   // Return all the elements for which a truth test fails.
-  _.reject = function(obj, iterator, context) {
+  _.reject = function(obj, predicate, context) {
     return _.filter(obj, function(value, index, list) {
-      return !iterator.call(context, value, index, list);
+      return !predicate.call(context, value, index, list);
     }, context);
   };
 
   // Determine whether all of the elements match a truth test.
   // Delegates to **ECMAScript 5**'s native `every` if available.
   // Aliased as `all`.
-  _.every = _.all = function(obj, iterator, context) {
-    iterator || (iterator = _.identity);
+  _.every = _.all = function(obj, predicate, context) {
+    predicate || (predicate = _.identity);
     var result = true;
     if (obj == null) return result;
-    if (nativeEvery && obj.every === nativeEvery) return obj.every(iterator, context);
+    if (nativeEvery && obj.every === nativeEvery) return obj.every(predicate, context);
     each(obj, function(value, index, list) {
-      if (!(result = result && iterator.call(context, value, index, list))) return breaker;
+      if (!(result = result && predicate.call(context, value, index, list))) return breaker;
     });
     return !!result;
   };
@@ -24972,13 +25120,13 @@ if (typeof define === "function" && define.amd) {
   // Determine if at least one element in the object matches a truth test.
   // Delegates to **ECMAScript 5**'s native `some` if available.
   // Aliased as `any`.
-  var any = _.some = _.any = function(obj, iterator, context) {
-    iterator || (iterator = _.identity);
+  var any = _.some = _.any = function(obj, predicate, context) {
+    predicate || (predicate = _.identity);
     var result = false;
     if (obj == null) return result;
-    if (nativeSome && obj.some === nativeSome) return obj.some(iterator, context);
+    if (nativeSome && obj.some === nativeSome) return obj.some(predicate, context);
     each(obj, function(value, index, list) {
-      if (result || (result = iterator.call(context, value, index, list))) return breaker;
+      if (result || (result = predicate.call(context, value, index, list))) return breaker;
     });
     return !!result;
   };
@@ -25004,25 +25152,19 @@ if (typeof define === "function" && define.amd) {
 
   // Convenience version of a common use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
-    return _.map(obj, function(value){ return value[key]; });
+    return _.map(obj, _.property(key));
   };
 
   // Convenience version of a common use case of `filter`: selecting only objects
   // containing specific `key:value` pairs.
-  _.where = function(obj, attrs, first) {
-    if (_.isEmpty(attrs)) return first ? void 0 : [];
-    return _[first ? 'find' : 'filter'](obj, function(value) {
-      for (var key in attrs) {
-        if (attrs[key] !== value[key]) return false;
-      }
-      return true;
-    });
+  _.where = function(obj, attrs) {
+    return _.filter(obj, _.matches(attrs));
   };
 
   // Convenience version of a common use case of `find`: getting the first object
   // containing specific `key:value` pairs.
   _.findWhere = function(obj, attrs) {
-    return _.where(obj, attrs, true);
+    return _.find(obj, _.matches(attrs));
   };
 
   // Return the maximum element or (element-based computation).
@@ -25032,13 +25174,15 @@ if (typeof define === "function" && define.amd) {
     if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
       return Math.max.apply(Math, obj);
     }
-    if (!iterator && _.isEmpty(obj)) return -Infinity;
-    var result = {computed : -Infinity, value: -Infinity};
+    var result = -Infinity, lastComputed = -Infinity;
     each(obj, function(value, index, list) {
       var computed = iterator ? iterator.call(context, value, index, list) : value;
-      computed > result.computed && (result = {value : value, computed : computed});
+      if (computed > lastComputed) {
+        result = value;
+        lastComputed = computed;
+      }
     });
-    return result.value;
+    return result;
   };
 
   // Return the minimum element (or element-based computation).
@@ -25046,16 +25190,18 @@ if (typeof define === "function" && define.amd) {
     if (!iterator && _.isArray(obj) && obj[0] === +obj[0] && obj.length < 65535) {
       return Math.min.apply(Math, obj);
     }
-    if (!iterator && _.isEmpty(obj)) return Infinity;
-    var result = {computed : Infinity, value: Infinity};
+    var result = Infinity, lastComputed = Infinity;
     each(obj, function(value, index, list) {
       var computed = iterator ? iterator.call(context, value, index, list) : value;
-      computed < result.computed && (result = {value : value, computed : computed});
+      if (computed < lastComputed) {
+        result = value;
+        lastComputed = computed;
+      }
     });
-    return result.value;
+    return result;
   };
 
-  // Shuffle an array, using the modern version of the 
+  // Shuffle an array, using the modern version of the
   // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisherâ€“Yates_shuffle).
   _.shuffle = function(obj) {
     var rand;
@@ -25069,11 +25215,12 @@ if (typeof define === "function" && define.amd) {
     return shuffled;
   };
 
-  // Sample **n** random values from an array.
-  // If **n** is not specified, returns a single random element from the array.
+  // Sample **n** random values from a collection.
+  // If **n** is not specified, returns a single random element.
   // The internal `guard` argument allows it to work with `map`.
   _.sample = function(obj, n, guard) {
-    if (arguments.length < 2 || guard) {
+    if (n == null || guard) {
+      if (obj.length !== +obj.length) obj = _.values(obj);
       return obj[_.random(obj.length - 1)];
     }
     return _.shuffle(obj).slice(0, Math.max(0, n));
@@ -25081,12 +25228,14 @@ if (typeof define === "function" && define.amd) {
 
   // An internal function to generate lookup iterators.
   var lookupIterator = function(value) {
-    return _.isFunction(value) ? value : function(obj){ return obj[value]; };
+    if (value == null) return _.identity;
+    if (_.isFunction(value)) return value;
+    return _.property(value);
   };
 
   // Sort the object's values by a criterion produced by an iterator.
-  _.sortBy = function(obj, value, context) {
-    var iterator = lookupIterator(value);
+  _.sortBy = function(obj, iterator, context) {
+    iterator = lookupIterator(iterator);
     return _.pluck(_.map(obj, function(value, index, list) {
       return {
         value: value,
@@ -25106,9 +25255,9 @@ if (typeof define === "function" && define.amd) {
 
   // An internal function used for aggregate "group by" operations.
   var group = function(behavior) {
-    return function(obj, value, context) {
+    return function(obj, iterator, context) {
       var result = {};
-      var iterator = value == null ? _.identity : lookupIterator(value);
+      iterator = lookupIterator(iterator);
       each(obj, function(value, index) {
         var key = iterator.call(context, value, index, obj);
         behavior(result, key, value);
@@ -25120,7 +25269,7 @@ if (typeof define === "function" && define.amd) {
   // Groups the object's values by a criterion. Pass either a string attribute
   // to group by, or a function that returns the criterion.
   _.groupBy = group(function(result, key, value) {
-    (_.has(result, key) ? result[key] : (result[key] = [])).push(value);
+    _.has(result, key) ? result[key].push(value) : result[key] = [value];
   });
 
   // Indexes the object's values by a criterion, similar to `groupBy`, but for
@@ -25139,7 +25288,7 @@ if (typeof define === "function" && define.amd) {
   // Use a comparator function to figure out the smallest index at which
   // an object should be inserted so as to maintain order. Uses binary search.
   _.sortedIndex = function(array, obj, iterator, context) {
-    iterator = iterator == null ? _.identity : lookupIterator(iterator);
+    iterator = lookupIterator(iterator);
     var value = iterator.call(context, obj);
     var low = 0, high = array.length;
     while (low < high) {
@@ -25171,7 +25320,9 @@ if (typeof define === "function" && define.amd) {
   // allows it to work with `_.map`.
   _.first = _.head = _.take = function(array, n, guard) {
     if (array == null) return void 0;
-    return (n == null) || guard ? array[0] : slice.call(array, 0, n);
+    if ((n == null) || guard) return array[0];
+    if (n < 0) return [];
+    return slice.call(array, 0, n);
   };
 
   // Returns everything but the last entry of the array. Especially useful on
@@ -25186,11 +25337,8 @@ if (typeof define === "function" && define.amd) {
   // values in the array. The **guard** check allows it to work with `_.map`.
   _.last = function(array, n, guard) {
     if (array == null) return void 0;
-    if ((n == null) || guard) {
-      return array[array.length - 1];
-    } else {
-      return slice.call(array, Math.max(array.length - n, 0));
-    }
+    if ((n == null) || guard) return array[array.length - 1];
+    return slice.call(array, Math.max(array.length - n, 0));
   };
 
   // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
@@ -25231,6 +25379,16 @@ if (typeof define === "function" && define.amd) {
     return _.difference(array, slice.call(arguments, 1));
   };
 
+  // Split an array into two arrays: one whose elements all satisfy the given
+  // predicate, and one whose elements all do not satisfy the predicate.
+  _.partition = function(array, predicate) {
+    var pass = [], fail = [];
+    each(array, function(elem) {
+      (predicate(elem) ? pass : fail).push(elem);
+    });
+    return [pass, fail];
+  };
+
   // Produce a duplicate-free version of the array. If the array has already
   // been sorted, you have the option of using a faster algorithm.
   // Aliased as `unique`.
@@ -25264,7 +25422,7 @@ if (typeof define === "function" && define.amd) {
     var rest = slice.call(arguments, 1);
     return _.filter(_.uniq(array), function(item) {
       return _.every(rest, function(other) {
-        return _.indexOf(other, item) >= 0;
+        return _.contains(other, item);
       });
     });
   };
@@ -25279,7 +25437,7 @@ if (typeof define === "function" && define.amd) {
   // Zip together multiple lists into a single array -- elements that share
   // an index go together.
   _.zip = function() {
-    var length = _.max(_.pluck(arguments, "length").concat(0));
+    var length = _.max(_.pluck(arguments, 'length').concat(0));
     var results = new Array(length);
     for (var i = 0; i < length; i++) {
       results[i] = _.pluck(arguments, '' + i);
@@ -25385,19 +25543,27 @@ if (typeof define === "function" && define.amd) {
   };
 
   // Partially apply a function by creating a version that has had some of its
-  // arguments pre-filled, without changing its dynamic `this` context.
+  // arguments pre-filled, without changing its dynamic `this` context. _ acts
+  // as a placeholder, allowing any combination of arguments to be pre-filled.
   _.partial = function(func) {
-    var args = slice.call(arguments, 1);
+    var boundArgs = slice.call(arguments, 1);
     return function() {
-      return func.apply(this, args.concat(slice.call(arguments)));
+      var position = 0;
+      var args = boundArgs.slice();
+      for (var i = 0, length = args.length; i < length; i++) {
+        if (args[i] === _) args[i] = arguments[position++];
+      }
+      while (position < arguments.length) args.push(arguments[position++]);
+      return func.apply(this, args);
     };
   };
 
-  // Bind all of an object's methods to that object. Useful for ensuring that
-  // all callbacks defined on an object belong to it.
+  // Bind a number of an object's methods to that object. Remaining arguments
+  // are the method names to be bound. Useful for ensuring that all callbacks
+  // defined on an object belong to it.
   _.bindAll = function(obj) {
     var funcs = slice.call(arguments, 1);
-    if (funcs.length === 0) throw new Error("bindAll must be passed function names");
+    if (funcs.length === 0) throw new Error('bindAll must be passed function names');
     each(funcs, function(f) { obj[f] = _.bind(obj[f], obj); });
     return obj;
   };
@@ -25436,12 +25602,13 @@ if (typeof define === "function" && define.amd) {
     var previous = 0;
     options || (options = {});
     var later = function() {
-      previous = options.leading === false ? 0 : new Date;
+      previous = options.leading === false ? 0 : _.now();
       timeout = null;
       result = func.apply(context, args);
+      context = args = null;
     };
     return function() {
-      var now = new Date;
+      var now = _.now();
       if (!previous && options.leading === false) previous = now;
       var remaining = wait - (now - previous);
       context = this;
@@ -25451,6 +25618,7 @@ if (typeof define === "function" && define.amd) {
         timeout = null;
         previous = now;
         result = func.apply(context, args);
+        context = args = null;
       } else if (!timeout && options.trailing !== false) {
         timeout = setTimeout(later, remaining);
       }
@@ -25464,24 +25632,33 @@ if (typeof define === "function" && define.amd) {
   // leading edge, instead of the trailing.
   _.debounce = function(func, wait, immediate) {
     var timeout, args, context, timestamp, result;
+
+    var later = function() {
+      var last = _.now() - timestamp;
+      if (last < wait) {
+        timeout = setTimeout(later, wait - last);
+      } else {
+        timeout = null;
+        if (!immediate) {
+          result = func.apply(context, args);
+          context = args = null;
+        }
+      }
+    };
+
     return function() {
       context = this;
       args = arguments;
-      timestamp = new Date();
-      var later = function() {
-        var last = (new Date()) - timestamp;
-        if (last < wait) {
-          timeout = setTimeout(later, wait - last);
-        } else {
-          timeout = null;
-          if (!immediate) result = func.apply(context, args);
-        }
-      };
+      timestamp = _.now();
       var callNow = immediate && !timeout;
       if (!timeout) {
         timeout = setTimeout(later, wait);
       }
-      if (callNow) result = func.apply(context, args);
+      if (callNow) {
+        result = func.apply(context, args);
+        context = args = null;
+      }
+
       return result;
     };
   };
@@ -25503,11 +25680,7 @@ if (typeof define === "function" && define.amd) {
   // allowing you to adjust arguments, run code before and after, and
   // conditionally execute the original function.
   _.wrap = function(func, wrapper) {
-    return function() {
-      var args = [func];
-      push.apply(args, arguments);
-      return wrapper.apply(this, args);
-    };
+    return _.partial(wrapper, func);
   };
 
   // Returns a function that is the composition of a list of functions, each
@@ -25537,8 +25710,9 @@ if (typeof define === "function" && define.amd) {
 
   // Retrieve the names of an object's properties.
   // Delegates to **ECMAScript 5**'s native `Object.keys`
-  _.keys = nativeKeys || function(obj) {
-    if (obj !== Object(obj)) throw new TypeError('Invalid object');
+  _.keys = function(obj) {
+    if (!_.isObject(obj)) return [];
+    if (nativeKeys) return nativeKeys(obj);
     var keys = [];
     for (var key in obj) if (_.has(obj, key)) keys.push(key);
     return keys;
@@ -25693,7 +25867,8 @@ if (typeof define === "function" && define.amd) {
     // from different frames are.
     var aCtor = a.constructor, bCtor = b.constructor;
     if (aCtor !== bCtor && !(_.isFunction(aCtor) && (aCtor instanceof aCtor) &&
-                             _.isFunction(bCtor) && (bCtor instanceof bCtor))) {
+                             _.isFunction(bCtor) && (bCtor instanceof bCtor))
+                        && ('constructor' in a && 'constructor' in b)) {
       return false;
     }
     // Add the first object to the stack of traversed objects.
@@ -25833,6 +26008,30 @@ if (typeof define === "function" && define.amd) {
     return value;
   };
 
+  _.constant = function(value) {
+    return function () {
+      return value;
+    };
+  };
+
+  _.property = function(key) {
+    return function(obj) {
+      return obj[key];
+    };
+  };
+
+  // Returns a predicate for checking whether an object has a given set of `key:value` pairs.
+  _.matches = function(attrs) {
+    return function(obj) {
+      if (obj === attrs) return true; //avoid comparing an object to itself.
+      for (var key in attrs) {
+        if (attrs[key] !== obj[key])
+          return false;
+      }
+      return true;
+    }
+  };
+
   // Run a function **n** times.
   _.times = function(n, iterator, context) {
     var accum = Array(Math.max(0, n));
@@ -25848,6 +26047,9 @@ if (typeof define === "function" && define.amd) {
     }
     return min + Math.floor(Math.random() * (max - min + 1));
   };
+
+  // A (possibly faster) way to get the current timestamp as an integer.
+  _.now = Date.now || function() { return new Date().getTime(); };
 
   // List of HTML entities for escaping.
   var entityMap = {
@@ -26045,6 +26247,18 @@ if (typeof define === "function" && define.amd) {
 
   });
 
+  // AMD registration happens at the end for compatibility with AMD loaders
+  // that may not enforce next-turn semantics on modules. Even though general
+  // practice for AMD registration is to be anonymous, underscore registers
+  // as a named module because, like jQuery, it is a base library that is
+  // popular enough to be bundled in a third party lib, but not be part of
+  // an AMD load request. Those cases could generate an error when an
+  // anonymous define() is called outside of a loader request.
+  if (typeof define === 'function' && define.amd) {
+    define('underscore', [], function() {
+      return _;
+    });
+  }
 }).call(this); 
  }; /* ==  End source for module /lib/underscore.js  == */ return module; }());;
 ;require._modules["/lib/uuid-v4.js"] = (function() { var __filename = "/lib/uuid-v4.js"; var __dirname = "/lib"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
@@ -26226,89 +26440,107 @@ exports.random = function() {
     }
 })(); 
  }; /* ==  End source for module /vendor/cookies.js  == */ return module; }());;
-;require._modules["/vendor/jquery.spin.js"] = (function() { var __filename = "/vendor/jquery.spin.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /vendor/jquery.spin.js  == */ var __module__ = function() { 
- /**
- * Copyright (c) 2011-2013 Felix Gnass
- * Licensed under the MIT license
- */
+;require._modules["/vendor/helpers.handlebars.js"] = (function() { var __filename = "/vendor/helpers.handlebars.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/helpers.handlebars.js  == */ var __module__ = function() { 
+ 
+var handlebars  = require('handlebars');
+var _           = require('cloak/underscore');
+// var moment      = require('moment');
 
-/*
+var dayNames = {
+	's':  'Sunday',
+	'm':  'Monday',
+	't':  'Tuesday',
+	'w':  'Wednesday',
+	'th': 'Thursday',
+	'f':  'Friday',
+	'sa': 'Saturday'
+};
 
-Basic Usage:
-============
+// 
+// Converts day shorthand codes (eg. th) into full day names (eg. Thursday)
+// 
+handlebars.registerHelper('dayName', function(day) {
+	return dayNames[day.toLowerCase()];
+});
 
-$('#el').spin(); // Creates a default Spinner using the text color of #el.
-$('#el').spin({ ... }); // Creates a Spinner using the provided options.
+// 
+// Checks if the given array contains the given value, and only renders the block
+// contents if it does
+// 
+handlebars.registerHelper('contains', function(arr, value, options) {
+	return (arr.indexOf(value) >= 0) ? options.fn(this) : '';
+});
 
-$('#el').spin(false); // Stops and removes the spinner.
+var startingIndent = /^(\s*)/;
 
-Using Presets:
-==============
+// 
+// Renders a <pre> tag with additional whitespace removed, for easier and cleaner
+// formatting of files
+// 
+handlebars.registerHelper('pre', function(lang, options) {
+	if (typeof lang !== 'string') {
+		options = lang; lang = null;
+	}
 
-$('#el').spin('small'); // Creates a 'small' Spinner using the text color of #el.
-$('#el').spin('large', '#fff'); // Creates a 'large' white Spinner.
+	var content = options.fn(this);
+	var lines = content.split('\n').slice(1);
 
-Adding a custom preset:
-=======================
+	var indent = new RegExp('^' + startingIndent.exec(lines[0])[0]);
 
-$.fn.spin.presets.flower = {
-  lines: 9
-  length: 10
-  width: 20
-  radius: 0
-}
+	return '<pre>' + (lang ? '<code class="language-' + lang + '">' : '') + _.map(lines, function(line) {
+		return line.replace(indent, '');
+	}).join('\n') + (lang ? '</code>' : '') + '</pre>';
+});
 
-$('#el').spin('flower', 'red');
+// 
+// Renders a <select> element
+// 
+handlebars.registerHelper('select', function(attrs, options, selected) {
+	var html = '<select';
 
-*/
+	attrs = attrs.split(';');
+	_.forEach(attrs, function(attr) {
+		attr = attr.split('=');
+		html += ' ' + attr[0];
+		if (attr[1]) {
+			html += '="' + attr[1] + '"';
+		}
+	});
 
-(function(factory) {
+	html += '>';
 
-  if (typeof exports == 'object') {
-    // CommonJS
-    factory(require('jquery'), require('spin'))
-  }
-  else if (typeof define == 'function' && define.amd) {
-    // AMD, register as anonymous module
-    define(['jquery', 'spin'], factory)
-  }
-  else {
-    // Browser globals
-    if (!window.Spinner) throw new Error('Spin.js not present')
-    factory(window.jQuery, window.Spinner)
-  }
+	_.forEach(_.keys(options), function(value) {
+		html += '<option value="' + value + '"';
+		if (selected === value) {
+			html += ' selected';
+		}
+		html += '>' + options[value] + '</option>';
+	});
 
-}(function($, Spinner) {
+	html += '</select>';
 
-  $.fn.spin = function(opts, color) {
+	return html;
+});
 
-    return this.each(function() {
-      var $this = $(this),
-        data = $this.data();
+// 
+// Calculates a time-ago string from a timestamp
+// 
+handlebars.registerHelper('timeago', function(timestamp) {
+	if (! timestamp) {
+		return 'never';
+	}
+	return moment(timestamp).fromNow();
+});
 
-      if (data.spinner) {
-        data.spinner.stop();
-        delete data.spinner;
-      }
-      if (opts !== false) {
-        opts = $.extend(
-          { color: color || $this.css('color') },
-          $.fn.spin.presets[opts] || opts
-        )
-        data.spinner = new Spinner(opts).spin(this)
-      }
-    })
-  }
-
-  $.fn.spin.presets = {
-    tiny: { lines: 8, length: 2, width: 2, radius: 3 },
-    small: { lines: 8, length: 4, width: 3, radius: 5 },
-    large: { lines: 10, length: 8, width: 4, radius: 8 }
-  }
-
-})); 
- }; /* ==  End source for module /vendor/jquery.spin.js  == */ return module; }());;
+// 
+// Outputs a page location value as a URI
+// 
+handlebars.registerHelper('pageLocation', function(loc) {
+	return loc === 'home' ? '/home' : '/pages/' + loc;
+});
+ 
+ }; /* ==  End source for module /vendor/helpers.handlebars.js  == */ return module; }());;
 ;require._modules["/vendor/prism/bash.js"] = (function() { var __filename = "/vendor/prism/bash.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
  /* ==  Begin source for module /vendor/prism/bash.js  == */ var __module__ = function() { 
  Prism.languages.bash = Prism.languages.extend('clike', {
@@ -26324,7 +26556,7 @@ $('#el').spin('flower', 'red');
 			'property': /\$([a-zA-Z0-9_#\?\-\*!@]+|\{[^\}]+\})/g
 		}
 	},
-	'keyword': /(^\$)|\b(if|then|else|elif|fi|for|break|continue|while|in|case|function|select|do|done|until|echo|exit|return|set|declare)\b/g
+	'keyword': /(^\s*\$)|\b(if|then|else|elif|fi|for|break|continue|while|in|case|function|select|do|done|until|echo|exit|return|set|declare)\b/g
 });
 
 Prism.languages.insertBefore('bash', 'keyword', {
@@ -26336,6 +26568,30 @@ Prism.languages.insertBefore('bash', 'comment', {
 	'important': /(^#!\s*\/bin\/bash)|(^#!\s*\/bin\/sh)/g
 }); 
  }; /* ==  End source for module /vendor/prism/bash.js  == */ return module; }());;
+;require._modules["/vendor/prism/folders.js"] = (function() { var __filename = "/vendor/prism/folders.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/prism/folders.js  == */ var __module__ = function() { 
+ 
+Prism.languages.folders = {
+    // Highlight symbols used to denote folder structure
+    'punctuation': /^([-|+`\s]+)/gm,
+
+    // Highlight the individual file names
+    'keyword':  /([a-zA-Z0-9._].+)/g
+};
+
+Prism.hooks.add('wrap', function(env) {
+    // Add classnames for file extensions
+    if (env.language === 'folders' && env.type === 'keyword') {
+        var parts = env.content.split('.');
+        while (parts.length > 1) {
+            parts.shift();
+            // Ex. 'foo.min.js' would become '<span class="token keyword ext-min-js ext-js">foo.min.js</span>'
+            env.classes.push('ext-' + parts.join('-'));
+        }
+    }
+});
+ 
+ }; /* ==  End source for module /vendor/prism/folders.js  == */ return module; }());;
 ;require._modules["/vendor/prism/http.js"] = (function() { var __filename = "/vendor/prism/http.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
  /* ==  Begin source for module /vendor/prism/http.js  == */ var __module__ = function() { 
  Prism.languages.http = {
@@ -26389,6 +26645,7 @@ for (var contentType in httpLanguages) {
 require('./prism');
 require('./bash');
 require('./http');
+require('./folders');
 
 module.exports = Prism;
 
@@ -26959,361 +27216,132 @@ Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(f
 
 })(); 
  }; /* ==  End source for module /vendor/prism/prism.js  == */ return module; }());;
-;require._modules["/vendor/spin.js"] = (function() { var __filename = "/vendor/spin.js"; var __dirname = "/vendor"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
- /* ==  Begin source for module /vendor/spin.js  == */ var __module__ = function() { 
- //fgnass.github.com/spin.js#v1.3.2
+;require._modules["/vendor/stupidtable/index.js"] = (function() { var __filename = "/vendor/stupidtable/index.js"; var __dirname = "/vendor/stupidtable"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/stupidtable/index.js  == */ var __module__ = function() { 
+ 
+// Temporarily expose jquery so stupidtable can get a reference to it
+window.jQuery = require('jquery');
 
-/**
- * Copyright (c) 2011-2013 Felix Gnass
- * Licensed under the MIT license
- */
-(function(root, factory) {
+require('./stupidtable');
 
-  /* CommonJS */
-  if (typeof exports == 'object')  module.exports = factory()
+window.jQuery = void(0);
+ 
+ }; /* ==  End source for module /vendor/stupidtable/index.js  == */ return module; }());;
+;require._modules["/vendor/stupidtable/stupidtable.js"] = (function() { var __filename = "/vendor/stupidtable/stupidtable.js"; var __dirname = "/vendor/stupidtable"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 
+ /* ==  Begin source for module /vendor/stupidtable/stupidtable.js  == */ var __module__ = function() { 
+ // Stupid jQuery table plugin.
 
-  /* AMD module */
-  else if (typeof define == 'function' && define.amd) define(factory)
+// Call on a table
+// sortFns: Sort functions for your datatypes.
+(function($) {
 
-  /* Browser global */
-  else root.Spinner = factory()
-}
-(this, function() {
-  "use strict";
+  $.fn.stupidtable = function(sortFns) {
+    return this.each(function() {
+      var $table = $(this);
+      sortFns = sortFns || {};
 
-  var prefixes = ['webkit', 'Moz', 'ms', 'O'] /* Vendor prefixes */
-    , animations = {} /* Animation rules keyed by their name */
-    , useCssAnimations /* Whether to use CSS animations or setTimeout */
+      // Merge sort functions with some default sort functions.
+      sortFns = $.extend({}, $.fn.stupidtable.default_sort_fns, sortFns);
 
-  /**
-   * Utility function to create elements. If no tag name is given,
-   * a DIV is created. Optionally properties can be passed.
-   */
-  function createEl(tag, prop) {
-    var el = document.createElement(tag || 'div')
-      , n
 
-    for(n in prop) el[n] = prop[n]
-    return el
-  }
+      // ==================================================== //
+      //                  Begin execution!                    //
+      // ==================================================== //
 
-  /**
-   * Appends children and returns the parent.
-   */
-  function ins(parent /* child1, child2, ...*/) {
-    for (var i=1, n=arguments.length; i<n; i++)
-      parent.appendChild(arguments[i])
+      // Do sorting when THs are clicked
+      $table.on("click.stupidtable", "th", function() {
+        var $this = $(this);
+        var th_index = 0;
+        var dir = $.fn.stupidtable.dir;
 
-    return parent
-  }
+        $table.find("th").slice(0, $this.index()).each(function() {
+          var cols = $(this).attr("colspan") || 1;
+          th_index += parseInt(cols,10);
+        });
 
-  /**
-   * Insert a new stylesheet to hold the @keyframe or VML rules.
-   */
-  var sheet = (function() {
-    var el = createEl('style', {type : 'text/css'})
-    ins(document.getElementsByTagName('head')[0], el)
-    return el.sheet || el.styleSheet
-  }())
+        // Determine (and/or reverse) sorting direction, default `asc`
+        var sort_dir = $this.data("sort-default") || dir.ASC;
+        if ($this.data("sort-dir"))
+           sort_dir = $this.data("sort-dir") === dir.ASC ? dir.DESC : dir.ASC;
 
-  /**
-   * Creates an opacity keyframe animation rule and returns its name.
-   * Since most mobile Webkits have timing issues with animation-delay,
-   * we create separate rules for each line/segment.
-   */
-  function addAnimation(alpha, trail, i, lines) {
-    var name = ['opacity', trail, ~~(alpha*100), i, lines].join('-')
-      , start = 0.01 + i/lines * 100
-      , z = Math.max(1 - (1-alpha) / trail * (100-start), alpha)
-      , prefix = useCssAnimations.substring(0, useCssAnimations.indexOf('Animation')).toLowerCase()
-      , pre = prefix && '-' + prefix + '-' || ''
+        // Choose appropriate sorting function.
+        var type = $this.data("sort") || null;
 
-    if (!animations[name]) {
-      sheet.insertRule(
-        '@' + pre + 'keyframes ' + name + '{' +
-        '0%{opacity:' + z + '}' +
-        start + '%{opacity:' + alpha + '}' +
-        (start+0.01) + '%{opacity:1}' +
-        (start+trail) % 100 + '%{opacity:' + alpha + '}' +
-        '100%{opacity:' + z + '}' +
-        '}', sheet.cssRules.length)
+        // Prevent sorting if no type defined
+        if (type === null) {
+          return;
+        }
 
-      animations[name] = 1
-    }
+        // Trigger `beforetablesort` event that calling scripts can hook into;
+        // pass parameters for sorted column index and sorting direction
+        $table.trigger("beforetablesort", {column: th_index, direction: sort_dir});
+        // More reliable method of forcing a redraw
+        $table.css("display");
 
-    return name
-  }
+        // Run sorting asynchronously on a timout to force browser redraw after
+        // `beforetablesort` callback. Also avoids locking up the browser too much.
+        setTimeout(function() {
+          // Gather the elements for this column
+          var column = [];
+          var sortMethod = sortFns[type];
+          var trs = $table.children("tbody").children("tr");
 
-  /**
-   * Tries various vendor prefixes and returns the first supported property.
-   */
-  function vendor(el, prop) {
-    var s = el.style
-      , pp
-      , i
+          // Extract the data for the column that needs to be sorted and pair it up
+          // with the TR itself into a tuple
+          trs.each(function(index,tr) {
+            var $e = $(tr).children().eq(th_index);
+            var sort_val = $e.data("sort-value");
+            var order_by = typeof(sort_val) !== "undefined" ? sort_val : $e.text();
+            column.push([order_by, tr]);
+          });
 
-    prop = prop.charAt(0).toUpperCase() + prop.slice(1)
-    for(i=0; i<prefixes.length; i++) {
-      pp = prefixes[i]+prop
-      if(s[pp] !== undefined) return pp
-    }
-    if(s[prop] !== undefined) return prop
-  }
+          // Sort by the data-order-by value
+          column.sort(function(a, b) { return sortMethod(a[0], b[0]); });
+          if (sort_dir != dir.ASC)
+            column.reverse();
 
-  /**
-   * Sets multiple style properties at once.
-   */
-  function css(el, prop) {
-    for (var n in prop)
-      el.style[vendor(el, n)||n] = prop[n]
+          // Replace the content of tbody with the sorted rows. Strangely (and
+          // conveniently!) enough, .append accomplishes this for us.
+          trs = $.map(column, function(kv) { return kv[1]; });
+          $table.children("tbody").append(trs);
 
-    return el
-  }
+          // Reset siblings
+          $table.find("th").data("sort-dir", null).removeClass("sorting-desc sorting-asc");
+          $this.data("sort-dir", sort_dir).addClass("sorting-"+sort_dir);
 
-  /**
-   * Fills in default values.
-   */
-  function merge(obj) {
-    for (var i=1; i < arguments.length; i++) {
-      var def = arguments[i]
-      for (var n in def)
-        if (obj[n] === undefined) obj[n] = def[n]
-    }
-    return obj
-  }
+          // Trigger `aftertablesort` event. Similar to `beforetablesort`
+          $table.trigger("aftertablesort", {column: th_index, direction: sort_dir});
+          // More reliable method of forcing a redraw
+          $table.css("display");
+        }, 10);
+      });
+    });
+  };
 
-  /**
-   * Returns the absolute page-offset of the given element.
-   */
-  function pos(el) {
-    var o = { x:el.offsetLeft, y:el.offsetTop }
-    while((el = el.offsetParent))
-      o.x+=el.offsetLeft, o.y+=el.offsetTop
+  // Enum containing sorting directions
+  $.fn.stupidtable.dir = {ASC: "asc", DESC: "desc"};
 
-    return o
-  }
-
-  /**
-   * Returns the line color from the given string or array.
-   */
-  function getColor(color, idx) {
-    return typeof color == 'string' ? color : color[idx % color.length]
-  }
-
-  // Built-in defaults
-
-  var defaults = {
-    lines: 12,            // The number of lines to draw
-    length: 7,            // The length of each line
-    width: 5,             // The line thickness
-    radius: 10,           // The radius of the inner circle
-    rotate: 0,            // Rotation offset
-    corners: 1,           // Roundness (0..1)
-    color: '#000',        // #rgb or #rrggbb
-    direction: 1,         // 1: clockwise, -1: counterclockwise
-    speed: 1,             // Rounds per second
-    trail: 100,           // Afterglow percentage
-    opacity: 1/4,         // Opacity of the lines
-    fps: 20,              // Frames per second when using setTimeout()
-    zIndex: 2e9,          // Use a high z-index by default
-    className: 'spinner', // CSS class to assign to the element
-    top: 'auto',          // center vertically
-    left: 'auto',         // center horizontally
-    position: 'relative'  // element position
-  }
-
-  /** The constructor */
-  function Spinner(o) {
-    if (typeof this == 'undefined') return new Spinner(o)
-    this.opts = merge(o || {}, Spinner.defaults, defaults)
-  }
-
-  // Global defaults that override the built-ins:
-  Spinner.defaults = {}
-
-  merge(Spinner.prototype, {
-
-    /**
-     * Adds the spinner to the given target element. If this instance is already
-     * spinning, it is automatically removed from its previous target b calling
-     * stop() internally.
-     */
-    spin: function(target) {
-      this.stop()
-
-      var self = this
-        , o = self.opts
-        , el = self.el = css(createEl(0, {className: o.className}), {position: o.position, width: 0, zIndex: o.zIndex})
-        , mid = o.radius+o.length+o.width
-        , ep // element position
-        , tp // target position
-
-      if (target) {
-        target.insertBefore(el, target.firstChild||null)
-        tp = pos(target)
-        ep = pos(el)
-        css(el, {
-          left: (o.left == 'auto' ? tp.x-ep.x + (target.offsetWidth >> 1) : parseInt(o.left, 10) + mid) + 'px',
-          top: (o.top == 'auto' ? tp.y-ep.y + (target.offsetHeight >> 1) : parseInt(o.top, 10) + mid)  + 'px'
-        })
-      }
-
-      el.setAttribute('role', 'progressbar')
-      self.lines(el, self.opts)
-
-      if (!useCssAnimations) {
-        // No CSS animation support, use setTimeout() instead
-        var i = 0
-          , start = (o.lines - 1) * (1 - o.direction) / 2
-          , alpha
-          , fps = o.fps
-          , f = fps/o.speed
-          , ostep = (1-o.opacity) / (f*o.trail / 100)
-          , astep = f/o.lines
-
-        ;(function anim() {
-          i++;
-          for (var j = 0; j < o.lines; j++) {
-            alpha = Math.max(1 - (i + (o.lines - j) * astep) % f * ostep, o.opacity)
-
-            self.opacity(el, j * o.direction + start, alpha, o)
-          }
-          self.timeout = self.el && setTimeout(anim, ~~(1000/fps))
-        })()
-      }
-      return self
+  $.fn.stupidtable.default_sort_fns = {
+    "int": function(a, b) {
+      return parseInt(a, 10) - parseInt(b, 10);
     },
-
-    /**
-     * Stops and removes the Spinner.
-     */
-    stop: function() {
-      var el = this.el
-      if (el) {
-        clearTimeout(this.timeout)
-        if (el.parentNode) el.parentNode.removeChild(el)
-        this.el = undefined
-      }
-      return this
+    "float": function(a, b) {
+      return parseFloat(a) - parseFloat(b);
     },
-
-    /**
-     * Internal method that draws the individual lines. Will be overwritten
-     * in VML fallback mode below.
-     */
-    lines: function(el, o) {
-      var i = 0
-        , start = (o.lines - 1) * (1 - o.direction) / 2
-        , seg
-
-      function fill(color, shadow) {
-        return css(createEl(), {
-          position: 'absolute',
-          width: (o.length+o.width) + 'px',
-          height: o.width + 'px',
-          background: color,
-          boxShadow: shadow,
-          transformOrigin: 'left',
-          transform: 'rotate(' + ~~(360/o.lines*i+o.rotate) + 'deg) translate(' + o.radius+'px' +',0)',
-          borderRadius: (o.corners * o.width>>1) + 'px'
-        })
-      }
-
-      for (; i < o.lines; i++) {
-        seg = css(createEl(), {
-          position: 'absolute',
-          top: 1+~(o.width/2) + 'px',
-          transform: o.hwaccel ? 'translate3d(0,0,0)' : '',
-          opacity: o.opacity,
-          animation: useCssAnimations && addAnimation(o.opacity, o.trail, start + i * o.direction, o.lines) + ' ' + 1/o.speed + 's linear infinite'
-        })
-
-        if (o.shadow) ins(seg, css(fill('#000', '0 0 4px ' + '#000'), {top: 2+'px'}))
-        ins(el, ins(seg, fill(getColor(o.color, i), '0 0 1px rgba(0,0,0,.1)')))
-      }
-      return el
+    "string": function(a, b) {
+      if (a < b) return -1;
+      if (a > b) return +1;
+      return 0;
     },
-
-    /**
-     * Internal method that adjusts the opacity of a single line.
-     * Will be overwritten in VML fallback mode below.
-     */
-    opacity: function(el, i, val) {
-      if (i < el.childNodes.length) el.childNodes[i].style.opacity = val
+    "string-ins": function(a, b) {
+      a = a.toLowerCase();
+      b = b.toLowerCase();
+      if (a < b) return -1;
+      if (a > b) return +1;
+      return 0;
     }
+  };
 
-  })
-
-
-  function initVML() {
-
-    /* Utility function to create a VML tag */
-    function vml(tag, attr) {
-      return createEl('<' + tag + ' xmlns="urn:schemas-microsoft.com:vml" class="spin-vml">', attr)
-    }
-
-    // No CSS transforms but VML support, add a CSS rule for VML elements:
-    sheet.addRule('.spin-vml', 'behavior:url(#default#VML)')
-
-    Spinner.prototype.lines = function(el, o) {
-      var r = o.length+o.width
-        , s = 2*r
-
-      function grp() {
-        return css(
-          vml('group', {
-            coordsize: s + ' ' + s,
-            coordorigin: -r + ' ' + -r
-          }),
-          { width: s, height: s }
-        )
-      }
-
-      var margin = -(o.width+o.length)*2 + 'px'
-        , g = css(grp(), {position: 'absolute', top: margin, left: margin})
-        , i
-
-      function seg(i, dx, filter) {
-        ins(g,
-          ins(css(grp(), {rotation: 360 / o.lines * i + 'deg', left: ~~dx}),
-            ins(css(vml('roundrect', {arcsize: o.corners}), {
-                width: r,
-                height: o.width,
-                left: o.radius,
-                top: -o.width>>1,
-                filter: filter
-              }),
-              vml('fill', {color: getColor(o.color, i), opacity: o.opacity}),
-              vml('stroke', {opacity: 0}) // transparent stroke to fix color bleeding upon opacity change
-            )
-          )
-        )
-      }
-
-      if (o.shadow)
-        for (i = 1; i <= o.lines; i++)
-          seg(i, -2, 'progid:DXImageTransform.Microsoft.Blur(pixelradius=2,makeshadow=1,shadowopacity=.3)')
-
-      for (i = 1; i <= o.lines; i++) seg(i)
-      return ins(el, g)
-    }
-
-    Spinner.prototype.opacity = function(el, i, val, o) {
-      var c = el.firstChild
-      o = o.shadow && o.lines || 0
-      if (c && i+o < c.childNodes.length) {
-        c = c.childNodes[i+o]; c = c && c.firstChild; c = c && c.firstChild
-        if (c) c.opacity = val
-      }
-    }
-  }
-
-  var probe = css(createEl('group'), {behavior: 'url(#default#VML)'})
-
-  if (!vendor(probe, 'transform') && probe.adj) initVML()
-  else useCssAnimations = vendor(probe, 'animation')
-
-  return Spinner
-
-})); 
- }; /* ==  End source for module /vendor/spin.js  == */ return module; }());;
+})(jQuery);
+ 
+ }; /* ==  End source for module /vendor/stupidtable/stupidtable.js  == */ return module; }());;

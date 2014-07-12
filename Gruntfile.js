@@ -87,7 +87,7 @@ module.exports = function(grunt) {
 				src: [
 					publicPath + '/stylesheets/normalize.css',
 					publicPath + '/stylesheets/foundation.css',
-					publicPath + '/stylesheets/prism-twilight.css',
+					publicPath + '/stylesheets/prism-coy.css',
 					buildPath + '/css/app.css'
 				],
 				dest: buildPath + '/css/styles.css'
@@ -125,25 +125,19 @@ module.exports = function(grunt) {
 
 		handlebars: {
 			all: {
-				src: publicPath + '/templates/**/*.hbs',
+				src: './templates/**/*.hbs',
 				dest: buildPath + '/js/templates.js',
 				options: {
 					node: true,
 					namespace: 'exports',
 					processName: function(filename) {
-						return filename.replace(/\.hbs$/, '').split('/').slice(3).join('.');
+						return filename.replace(/\.hbs$/, '').split('/').slice(2).join('.');
 					}
 				}
 			}
 		},
 
 		gitpush: {
-			github: {
-				options: {
-					remote: 'origin',
-					branch: 'master'
-				}
-			},
 			heroku: {
 				options: {
 					remote: 'heroku',
@@ -189,6 +183,6 @@ module.exports = function(grunt) {
 	grunt.registerTask('templates', ['handlebars']);
 	grunt.registerTask('default', ['mkdir:build', 'js', 'css']);
 	grunt.registerTask('deploy', ['default', 'uglify:commonjs', 'uglify:lib', 'uglify:app',
-		'gitcommit:deploy_build', 'gitpush:github', 'gitpush:heroku']);
+		'gitcommit:deploy_build', 'gitpush:heroku']);
 
 };
