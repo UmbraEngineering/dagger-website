@@ -38,6 +38,18 @@ function program5(depth0,data) {
   return "\n				$ dagger init --deps\n			";
   }
 
+function program7(depth0,data) {
+  
+  
+  return "\n				$ dagger create endpoint test\n			";
+  }
+
+function program9(depth0,data) {
+  
+  
+  return "\n				var Endpoint = require('dagger.js/lib/endpoint');\n\n				//\n				// Create a new \"/test\" endpoint\n				//\n				var TestEndpoint = module.exports = new Endpoint({\n\n					route: '/test',\n\n					//\n					// Handles GET requests to the base route \"/test\"\n					//\n					'get': function(req) {\n						// ...\n					},\n\n					//\n					// Handles POST requests to the base route \"/test\"\n					//\n					'post': function(req) {\n						// ...\n					},\n\n					//\n					// Handles GET requests to the sub-route \"/test/foo\"\n					//\n					'get /foo': function(req) {\n						// ...\n					}\n\n				});\n			";
+  }
+
   buffer += "<div class=\"row content\">\n	<p class=\"intro\">\n		Dagger is a <a href=\"http://nodejs.org\">Node.js</a> RESTful API framework with built-in websocket support, built on top of\n		well known and trusted tools like <a href=\"http://expressjs.com/\">Express.js</a>, <a href=\"http://socket.io/\">Socket.io</a>,\n		and <a href=\"http://www.mongodb.org/\">MongoDB</a> / <a href=\"http://mongoosejs.com/\">Mongoose</a>.\n	</p>\n\n	<h2>Getting Started</h2>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-6 medium-push-6 columns\">\n			<p>\n				First things first, install the Dagger CLI scaffolding tool from npm.\n			</p>\n		</div>\n		<div class=\"small-12 medium-6 medium-pull-6 columns\">\n			";
   stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
@@ -47,7 +59,13 @@ function program5(depth0,data) {
   buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-6 medium-push-6 columns\">\n			<p>\n				Next, initialize your new dagger project!\n			</p>\n		</div>\n		<div class=\"small-12 medium-6 medium-pull-6 columns\">\n			";
   stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n		</div>\n	</div>\n	\n\n	\n\n	\n</div>\n";
+  buffer += "\n		</div>\n	</div>\n\n	<h2>Start Building</h2>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-6 medium-push-6 columns\">\n			<p>\n				Creating new models/endpoints in dagger in easy, as all new content creation can be done with the CLI tool.\n				This creates a new file <code>endpoints/test.js</code> with a barebones dagger endpoint instance in it.\n			</p>\n		</div>\n		<div class=\"small-12 medium-6 medium-pull-6 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Dagger endpoints are designed to be very simple to use. You just create a new instance of the endpoint\n				class, passing in a base <code>route</code> string (like <code>\"/test\"</code>) and then define how the route\n				should handle various HTTP verbs and sub-routes.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	\n\n\n	\n\n	\n\n	\n</div>\n";
   return buffer;
   });
 

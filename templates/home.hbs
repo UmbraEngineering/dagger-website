@@ -45,6 +45,118 @@
 			{{/pre}}
 		</div>
 	</div>
+
+	<h2>Start Building</h2>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				Creating new models/endpoints in dagger in easy, as all new content creation can be done with the CLI tool.
+				This creates a new file <code>endpoints/test.js</code> with a barebones dagger endpoint instance in it.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger create endpoint test
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Dagger endpoints are designed to be very simple to use. You just create a new instance of the endpoint
+				class, passing in a base <code>route</code> string (like <code>"/test"</code>) and then define how the route
+				should handle various HTTP verbs and sub-routes.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "javascript"}}
+				var Endpoint = require('dagger.js/lib/endpoint');
+
+				//
+				// Create a new "/test" endpoint
+				//
+				var TestEndpoint = module.exports = new Endpoint({
+
+					route: '/test',
+
+					//
+					// Handles GET requests to the base route "/test"
+					//
+					'get': function(req) {
+						// ...
+					},
+
+					//
+					// Handles POST requests to the base route "/test"
+					//
+					'post': function(req) {
+						// ...
+					},
+
+					//
+					// Handles GET requests to the sub-route "/test/foo"
+					//
+					'get /foo': function(req) {
+						// ...
+					}
+
+				});
+			{{/pre}}
+		</div>
+	</div>
+
+	{{!-- <div class="row drop">
+		<div class="small-12 medium-8 medium-offset-2 columns">
+			<div class="file">
+				<h3>endpoints/test.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint   = require('dagger.js/lib/endpoint');
+					var HttpError  = require('dagger.js/lib/http-meta').HttpError;
+
+					var TestEndpoint = module.exports = new Endpoint({
+
+						route: '/test',
+						
+						//
+						// GET /test
+						//
+						"get": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// POST /test
+						//
+						"post": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// PUT|PATCH /test
+						//
+						"put|patch": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// DELETE /test
+						//
+						"delete": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						}
+						
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div> --}}
+
+
 	
 
 	

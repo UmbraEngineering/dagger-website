@@ -42,13 +42,12 @@ pre[class*="language-"] {
   background-size: 3em 3em;
   background-origin:content-box;
   overflow:visible;
-  max-height:30em;
 }
 
 code[class*="language"] {
-  max-height: 29em;
   display: block;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 /* Margin bottom to accomodate shadow */

@@ -4126,13 +4126,12 @@ pre[class*="language-"] {
   background-size: 3em 3em;
   background-origin:content-box;
   overflow:visible;
-  max-height:30em;
 }
 
 code[class*="language"] {
-  max-height: 29em;
   display: block;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: visible;
 }
 
 /* Margin bottom to accomodate shadow */
@@ -4280,6 +4279,20 @@ pre[class*="language-"]:after {
   margin: 5rem auto;
 }
 
+div.file {
+  padding: 0;
+  margin: 4rem 0;
+}
+
+div.file h3 {
+  font-size: 1rem;
+  padding: 1em 1.5em;
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+  border: 1px #e5e5e5 solid;
+  border-width: 1px 1px 0;
+  border-radius: 10px 10px 0 0;
+}
+
 /* ==  Header  == */
 
 #header {
@@ -4371,7 +4384,7 @@ h2 {
 
 p {
   color: #444;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
 }
 
 dl {

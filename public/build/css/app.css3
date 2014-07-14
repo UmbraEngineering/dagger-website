@@ -7,6 +7,20 @@
 		margin: 5rem auto;
 	}
 
+div.file {
+	padding: 0;
+	margin: 4rem 0;
+}
+	
+	div.file h3 {
+		font-size: 1rem;
+		padding: 1em 1.5em;
+		font-family: Consolas, "Liberation Mono", Courier, monospace;
+		border: 1px #e5e5e5 solid;
+		border-width: 1px 1px 0;
+		border-radius: 10px 10px 0 0;
+	}
+
 
 
 /* ==  Header  == */
@@ -101,7 +115,7 @@
 
 	p {
 		color: #444;
-		font-size: 1.3rem;
+		font-size: 1.4rem;
 	}
 
 	dl {
