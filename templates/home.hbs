@@ -2,7 +2,8 @@
 	<p class="intro">
 		Dagger is a <a href="http://nodejs.org">Node.js</a> RESTful API framework with built-in websocket support, built on top of
 		well known and trusted tools like <a href="http://expressjs.com/">Express.js</a>, <a href="http://socket.io/">Socket.io</a>,
-		and <a href="http://www.mongodb.org/">MongoDB</a> / <a href="http://mongoosejs.com/">Mongoose</a>.
+		and <a href="http://www.mongodb.org/">MongoDB</a> / <a href="http://mongoosejs.com/">Mongoose</a>. Designed for rapid yet
+		versatile development, Dagger is a powerful new tool to add to your arsenal.
 	</p>
 
 	<h2>Getting Started</h2>
@@ -73,45 +74,7 @@
 	</div>
 
 	<div class="row">
-		<div class="small-12 columns">
-			{{#pre "javascript"}}
-				var Endpoint = require('dagger.js/lib/endpoint');
-
-				//
-				// Create a new "/test" endpoint
-				//
-				var TestEndpoint = module.exports = new Endpoint({
-
-					route: '/test',
-
-					//
-					// Handles GET requests to the base route "/test"
-					//
-					'get': function(req) {
-						// ...
-					},
-
-					//
-					// Handles POST requests to the base route "/test"
-					//
-					'post': function(req) {
-						// ...
-					},
-
-					//
-					// Handles GET requests to the sub-route "/test/foo"
-					//
-					'get /foo': function(req) {
-						// ...
-					}
-
-				});
-			{{/pre}}
-		</div>
-	</div>
-
-	{{!-- <div class="row drop">
-		<div class="small-12 medium-8 medium-offset-2 columns">
+		<div class="small-12 medium-10 medium-offset-1 columns">
 			<div class="file">
 				<h3>endpoints/test.js</h3>
 				{{#pre "javascript"}}
@@ -154,72 +117,133 @@
 				{{/pre}}
 			</div>
 		</div>
-	</div> --}}
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				By default, creating a new endpoint results in a file like the one above, with a blank function
+				for each of the four <abbr title="Create, Read, Update, Destroy">CRUD</abbr> operations. You can
+				remove any of these functions that you do not intend to use, or add new ones as needed (eg. to
+				handle references to individual documents, you might add a <code>"get /:id"</code> method).
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				You can start up your new application server by running the <code>app.js</code> file.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ node app.js
+			{{/pre}}
+		</div>
+	</div>
+
+	<h2>Models</h2>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Dagger models are just mongoose models that have been extended and made a little easier to set up.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				You can create a new model using the CLI tool. The resulting model file from this command will contain
+				a mongoose schema with the fields <code>name</code>, <code>email</code>, and <code>age</code> defined.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger create model person --fields name,email,age:Number
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>models/person.js</h3>
+				{{#pre "javascript"}}
+					var models = require('dagger.js/lib/models');
 
 
-	
+					// 
+					// Define the Person schema
+					// 
+					// There is no need to create the actual model here (eg. `mongoose.model('Person', PersonSchema)`)
+					// as that is handled automatically by dagger's model module.
+					// 
+					var PersonSchema = module.exports = new models.Schema({
+						name: { type: String },
+						email: { type: String },
+						age: { type: Number }
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
 
-	
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				You can define methods and static functions on Dagger models the same way you would any mongoose model.
+			</p>
+		</div>
+	</div>
 
-	{{!-- <p>
-		From there, you can create a new project and get up running with just a couple commands.
-	</p>
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>models/person.js</h3>
+				{{#pre "javascript"}}
+					var models = require('dagger.js/lib/models');
 
-	{{#pre "bash"}}
-		$ mkdir your-project
-		$ cd your-project
 
-		# Create a new dagger project and install dependencies
-		$ dagger init --deps
+					// 
+					// Define the Person schema
+					// 
+					// There is no need to create the actual model here (eg. `mongoose.model('Person', PersonSchema)`)
+					// as that is handled automatically by dagger's model module.
+					// 
+					var PersonSchema = module.exports = new models.Schema({
+						name: { type: String },
+						email: { type: String },
+						age: { type: Number }
+					});
 
-		# Now, let's create an endpoint
-		$ dagger create endpoint test
-	{{/pre}}
+					//
+					// An example of defining a static function
+					//
+					PersonSchema.statics.findByEmail = function(email, callback) {
+						return this.find({ email: email }, callback);
+					};
 
-	<p>
-		You should now have the following in the <code>your-project</code> directory.
-	</p>
+					//
+					// An example of defining a model method
+					//
+					PersonSchema.methods.makeOlder = function(callback) {
+						this.age++;
+						this.save(callback);
+					};
+				{{/pre}}
+			</div>
+		</div>
+	</div>
 
-	<dl class="files">
-		<dt><code>app.js</code></dt>
-		<dd>
-			This file starts up your application. You can add entries to this file for middlewares and bootstrapping
-			modules.
-		</dd>
-
-		<dt><code>package.json</code></dt>
-		<dd>
-			Describes your application and it's dependencies. More info about <code>package.json</code> files can be
-			found on the <a href="https://www.npmjs.org/doc/package.json.html">NPM website</a>.
-		</dd>
-
-		<dt><code>config</code></dt>
-		<dd>
-			This directory contains your configuration files. The <code>master.js</code> file is the base configuration,
-			then you have one other file for each environment (<code>development.js</code> and <code>production.js</code>).
-		</dd>
-
-		<dt><code>bootstrap</code></dt>
-		<dd>
-			This directory is for bootstrapping modules which run at app start up.
-		</dd>
-
-		<dt><code>middlewares</code></dt>
-		<dd>
-			This directory is for middleware modules that run for each incoming request.
-		</dd>
-
-		<dt><code>models</code></dt>
-		<dd>
-			This directory is for your models definitions. Each file contains a mongoose schema along with any methods
-			you want to define for the model.
-		</dd>
-
-		<dt><code>endpoints</code></dt>
-		<dd>
-			This directory is for your endpoint definitions. Each file defines an <code>Endpoint</code> instance which
-			defines how the server is to respond to different types of requests at the given path. The endpoint we created
-			above will be stored in this directory as <code>test.js</code>.
-		</dd>
-	</dl> --}}
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				For more help getting started, you can take a look at the <a href="/#guides">guides</a> or
+				the <a href="/#docs">documentation</a>.
+			</p>
+		</div>
+	</div>
 </div>

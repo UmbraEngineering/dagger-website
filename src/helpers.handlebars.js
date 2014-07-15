@@ -17,7 +17,17 @@ handlebars.registerHelper('pre', function(lang, options) {
 
 	var indent = new RegExp('^' + startingIndent.exec(lines[0])[0]);
 
+	// Remove any empty lines from the end
+	while (isEmpty(lines[lines.length - 1])) {
+		lines.pop();
+	}
+
 	return '<pre>' + (lang ? '<code class="language-' + lang + '">' : '') + lines.map(function(line) {
 		return line.replace(indent, '');
 	}).join('\n') + (lang ? '</code>' : '') + '</pre>';
 });
+
+var whitespace = /\s*/g;
+function isEmpty(str) {
+	return ! str.replace(whitespace, '');
+}

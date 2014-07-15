@@ -2,12 +2,12 @@
 var templates   = require('templates');
 var View        = require('cloak/view');
 
-require('./_highlight');
+require('../_highlight');
 
-var GettingStartedView = module.exports = View.extend({
+var GuideListView = module.exports = View.extend({
 
-	className: 'getting-started',
-	template: templates['getting-started'],
+	className: 'guide-list',
+	template: templates['guides.list'],
 
 	events: {
 		// 

@@ -16,6 +16,7 @@
 			<h1><a href="/#">Dagger.js</a></h1>
 			<nav>
 				<ul>
+					<li><a href="/#guides">Guides</a></li>
 					<li><a href="/#docs">Documentation</a></li>
 					<li><a href="https://github.com/UmbraEngineering/dagger">GitHub</a></li>
 					<li><a href="https://github.com/UmbraEngineering/dagger/issues">Issues</a></li>
@@ -26,6 +27,11 @@
 			{{#if wrapper}}{{{ wrapper.[0] }}}{{/if}}
 			{{{ body }}}
 			{{#if wrapper}}{{{ wrapper.[1] }}}{{/if}}
+		</div>
+		<div id="footer">
+			Copyright &copy; {{ year }} <a href="http://www.umbraengineering.com">Umbra Engineering LLC</a><br />
+			Dagger.js code licensed under <a href="http://opensource.org/licenses/MIT">MIT</a>. This site and documentation
+			licensed under <a href="http://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.
 		</div>
 	</div>
 	
@@ -49,9 +55,7 @@
 
 		// Load the router
 		var Router = require('routers/main');
-		var router = new Router({ autoStart: false })
-			.use(require('routers/docs'))
-			.start();
+		var router = new Router({ autoStart: false }).start();
 
 	</script>
 

@@ -1,0 +1,23 @@
+
+section.guide-list {
+	/**/
+}
+
+	@media only screen and (min-width:40.063em) {
+		/* Only override these margins if we are not on a small screen */
+		section.guide-list .row.content {
+			margin-top: 0;
+		}
+
+			section.guide-list h2 {
+				margin-top: 0;
+			}
+	}
+
+		section.guide-list ul {
+			list-style-type: none;
+		}
+
+			section.guide-list ul li {
+				font-size: 1.3rem;
+			}

@@ -26488,6 +26488,11 @@ handlebars.registerHelper('pre', function(lang, options) {
 
 	var indent = new RegExp('^' + startingIndent.exec(lines[0])[0]);
 
+	// Remove any empty lines from the end
+	while (isEmpty(lines[lines.length - 1])) {
+		lines.pop();
+	}
+
 	return '<pre>' + (lang ? '<code class="language-' + lang + '">' : '') + _.map(lines, function(line) {
 		return line.replace(indent, '');
 	}).join('\n') + (lang ? '</code>' : '') + '</pre>';
@@ -26539,6 +26544,15 @@ handlebars.registerHelper('timeago', function(timestamp) {
 handlebars.registerHelper('pageLocation', function(loc) {
 	return loc === 'home' ? '/home' : '/pages/' + loc;
 });
+
+
+
+
+var whitespace = /\s*/g;
+function isEmpty(str) {
+	return ! str.replace(whitespace, '');
+}
+
  
  }; /* ==  End source for module /vendor/helpers.handlebars.js  == */ return module; }());;
 ;require._modules["/vendor/prism/bash.js"] = (function() { var __filename = "/vendor/prism/bash.js"; var __dirname = "/vendor/prism"; var module = { loaded: false, exports: { }, filename: __filename, dirname: __dirname, require: null, call: function() { module.loaded = true; module.call = function() { }; __module__(); }, parent: null, children: [ ] }; var process = { title: "browser", nextTick: function(func) { setTimeout(func, 0); } }; var require = module.require = window.require._bind(module); var exports = module.exports; 

@@ -7,9 +7,12 @@ section.home {
 		margin-top: 1.25rem;
 	}
 
-@media only screen and (max-width: 40em) {
-	section.home .intro {
-		line-height: 1.8;
+	section.home p.intro {
 		text-align: center;
+	}
+
+@media (--small) {
+	section.home p.intro {
+		line-height: 1.8;
 	}
 }

@@ -1,4 +1,33 @@
 
+
+:root {
+	--monospace-font: Consolas, "Liberation Mono", Courier, monospace;
+}
+
+@custom-media --small screen and (max-width: 40em);
+@custom-media --medium screen and (min-width:40.063em) and (max-width:64em);
+@custom-media --large screen and (min-width:64.063em);
+@custom-media --x-large screen and (min-width:90.063em);
+@custom-media --xx-large screen and (min-width:120.063em);
+
+
+
+
+
+html, body {
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+	#wrapper {
+		position: relative;
+		min-height: 100%;
+	}
+
+
+
+
 .row {
 	max-width: 80%;
 }
@@ -8,18 +37,29 @@
 	}
 
 div.file {
-	padding: 0;
-	margin: 4rem 0;
+	margin: 2rem 0;
+	padding: 1em 1em 0;
+	border: 1px #e5e5e5 solid;
+	border-radius: 10px;
+	background: #f5f5f5;
 }
 	
 	div.file h3 {
 		font-size: 1rem;
-		padding: 1em 1.5em;
-		font-family: Consolas, "Liberation Mono", Courier, monospace;
-		border: 1px #e5e5e5 solid;
-		border-width: 1px 1px 0;
-		border-radius: 10px 10px 0 0;
+		padding: 0 0 1em;
+		font-weight: bold;
+		font-family: var(--monospace-font);
 	}
+
+@media only screen and (max-width:90em) {
+	.row {
+		max-width: 90%;
+	}
+
+		.row.content {
+			margin: 2rem auto;
+		}
+}
 
 
 
@@ -36,7 +76,7 @@ div.file {
 		font-weight: normal;
 	}
 
-		h1 a, h1 a:hover {
+		h1 a, h1 a:hover, h1 a:active, h1 a:focus {
 			color: inherit;
 		}
 
@@ -67,7 +107,7 @@ div.file {
 					}
 	}
 
-	@media only screen and (max-width: 40em) {
+	@media (--small) {
 		#header nav {
 			padding: 2rem 0 0;
 		}
@@ -101,7 +141,7 @@ div.file {
 /* ==  Content  == */
 
 #content {
-	padding: 25px 50px;
+	padding: 25px 50px 10rem;
 }
 
 
@@ -134,27 +174,20 @@ div.file {
 
 
 
-@media only screen and (max-width: 40em) {
+@media (--small) {
 	html, body {
 		font-size: 90%;
 	}
 
 	#content {
 		padding: 5px;
+		padding-bottom: 13rem;
 	}
 
 		#content > section {
 			margin: 0;
 			padding: 0;
 		}
-
-		.row {
-			max-width: 90%;
-		}
-
-			.row.content {
-				margin: 2rem auto;
-			}
 
 	p {
 		margin: 0 0 1.25rem;
@@ -180,6 +213,52 @@ div.file {
 }
 
 
+
+/* ==  Footer  == */
+
+#footer {
+	padding: 2rem;
+	background: #333;
+	color: #fff;
+	line-height: 1.4;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 7rem;
+}
+
+@media (--small) {
+	#footer {
+		height: 8rem;
+	}
+}
+
+
+section.guide-list {
+	/**/
+}
+
+	@media only screen and (min-width:40.063em) {
+		/* Only override these margins if we are not on a small screen */
+		section.guide-list .row.content {
+			margin-top: 0;
+		}
+
+			section.guide-list h2 {
+				margin-top: 0;
+			}
+	}
+
+		section.guide-list ul {
+			list-style-type: none;
+		}
+
+			section.guide-list ul li {
+				font-size: 1.3rem;
+			}
+
+
 section.home {
 	/**/
 }
@@ -188,9 +267,12 @@ section.home {
 		margin-top: 1.25rem;
 	}
 
-@media only screen and (max-width: 40em) {
-	section.home .intro {
-		line-height: 1.8;
+	section.home p.intro {
 		text-align: center;
+	}
+
+@media (--small) {
+	section.home p.intro {
+		line-height: 1.8;
 	}
 }

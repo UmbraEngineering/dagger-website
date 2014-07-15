@@ -5,7 +5,7 @@ var cloak                = require('cloak');
 var Router               = require('cloak/router');
 
 var HomeView             = require('views/home');
-var GettingStartedView   = require('views/getting-started');
+var GuideListView        = require('views/guides/list');
 
 // --------------------------------------------------------
 
@@ -14,7 +14,10 @@ var MainRouter = module.exports = Router.extend({
 	routes: {
 		'':                     'index',
 		'/':                    'index',
-		'/getting-started':     'gettingStarted'
+		'/guides':              'guides',
+		'/guides/:page':        'showGuide',
+		'/docs':                'docs',
+		'/docs/:page':          'showDocPage'
 	},
 
 	initialize: function() {
@@ -33,11 +36,36 @@ var MainRouter = module.exports = Router.extend({
 		this.drawPage(HomeView);
 	},
 
+// --------------------------------------------------------
+
 	// 
-	// "/getting-started"
+	// "/guides"
 	// 
-	gettingStarted: function() {
-		this.drawPage(GettingStartedView);
+	guides: function() {
+		this.drawPage(GuideListView);
+	},
+
+	// 
+	// "/guides/:page"
+	// 
+	showGuide: function(params) {
+		// 
+	},
+
+// --------------------------------------------------------
+
+	// 
+	// "/docs"
+	// 
+	docs: function() {
+		this.drawPage(/* ... */);
+	},
+
+	// 
+	// "/docs/:page"
+	// 
+	showDocPage: function(params) {
+		// 
 	},
 
 // --------------------------------------------------------
@@ -67,6 +95,8 @@ var MainRouter = module.exports = Router.extend({
 			var current = this.currentView;
 			var next = new PageView();
 			next.draw();
+
+			this.currentView = next;
 
 			$content.animate({ opacity: 'hide' }, 300, function() {
 				current.remove();
