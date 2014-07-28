@@ -1,0 +1,529 @@
+<div class="row content">
+	<h2>Guides: The <code>dagger</code> Command</h2>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				The <code>dagger</code> command provides scaffolding utilities to help you build your app more efficiently. This guide
+				will walk you through the basics of using the scaffolding tool to build your application. The first thing you will do
+				with the scaffold is creating new projects. This is done with the <code>dagger init</code> command. This command
+				creates all of the basic directories and files needed for a dagger app. You can also add a <code>--deps</code> flag to
+				the command which will install all of Dagger's dependencies as well.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				$ dagger init [--deps]
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				From there, you can use the scaffold to create your app's components.
+			</p>
+		</div>
+	</div>
+
+
+
+	<h3 id="models">Models</h3>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				Using the <code>dagger create model</code> command you can create a new model. The file will be saved to your app's
+				<code>models</code> directory.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger create model &lt;modelName> [--fields &lt;fieldList>]
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				For example, if you're going to create a person model, you can define the fields like this:
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				$ dagger create model person --fields name,email,age
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				This would create the following model file:
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>models/person.js</h3>
+				{{#pre "javascript"}}
+					var models = require('dagger.js/lib/models');
+
+
+					// 
+					// Define the Person schema
+					// 
+					// There is no need to create the actual model here (eg. `mongoose.model('Person', PersonSchema)`)
+					// as that is handled automatically by dagger's model module.
+					// 
+					var PersonSchema = module.exports = new models.Schema({
+						name: { type: String },
+						email: { type: String },
+						age: { type: String }
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				By default, all the fields you define with the <code>--fields</code> flag are defined as simple <code>String</code>
+				fields. It probably makes more sense to make the <code>age</code> field a <code>Number</code>. You can define the
+				type of a field when creating the model by giving the type with the field name:
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				$ dagger create model person --fields name,email,age:Number
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				You can <a href="#templates">modify the template model or create new templates</a> using the <code>dagger config
+				template</code> command. From there, you can choose what template to use when creating new models using the
+				<code>--template</code> option.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				$ dagger create model person --template &lt;templateName>
+			{{/pre}}
+		</div>
+	</div>
+
+
+
+	<h3 id="endpoints">Endpoints</h3>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				You can create new endpoints for your application using the <code>dagger create endpoint</code> command.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger create endpoint &lt;endpointName> [for &lt;model>]
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Using the command in the simplest form (without the <code>for</code> clause) will create a new
+				endpoint file containing a bare-bones endpoint instance with empty functions for each of the four
+				<abbr title="Create, Read, Update, Destroy">CRUD</abbr> operations.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>endpoints/foo.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint   = require('dagger.js/lib/endpoint');
+					var HttpError  = require('dagger.js/lib/http-meta').HttpError;
+
+					var FooEndpoint = module.exports = new Endpoint({
+
+						route: '/foo',
+						
+						//
+						// GET /foo
+						//
+						"get": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// POST /foo
+						//
+						"post": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// PUT|PATCH /foo
+						//
+						"put|patch": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// DELETE /foo
+						//
+						"delete": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						}
+						
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				The <code>for</code> clause changes the default <a href="#templates">template</a> for the endpoint
+				from <code>base</code> to <code>model</code>. That template contains functions for all the basic
+				RESTful operations, including the following:
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<dl>
+				<dt><code>GET /foo</code></dt>
+				<dd>
+					Bulk read operations with support for many querying functionalities
+				</dd>
+
+				<dt><code>GET /foo/:id</code></dt>
+				<dd>
+					Reads a single document from the database by <code>ObjectId</code>
+				</dd>
+
+				<dt><code>POST /foo</code></dt>
+				<dd>
+					Creates a new document
+				</dd>
+
+				<dt><code>PUT /foo</code></dt>
+				<dt><code>PATCH /foo</code></dt>
+				<dd>
+					Bulk update operations, allows sending multiple documents with updates
+				</dd>
+				
+				<dt><code>PUT /foo/:id</code></dt>
+				<dt><code>PATCH /foo/:id</code></dt>
+				<dd>
+					Updates a single document by <code>ObjectId</code>
+				</dd>
+				
+				<dt><code>DELETE /foo</code></dt>
+				<dd>
+					Bulk delete operations, allows deleting multiple documents
+				</dd>
+				
+				<dt><code>DELETE /foo/:id</code></dt>
+				<dd>
+					Deletes a single document by <code>ObjectId</code>
+				</dd>
+			</dl>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Like with <a href="#models">models</a>, you can use the CLI's <a href="#templates">templating system</a> to
+				modify the templates used for generating your endpoint files, and to choose which template to use when creating
+				one.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				$ dagger create endpoint foo --template &lt;templateName>
+			{{/pre}}
+		</div>
+	</div>
+
+
+
+	<h3 id="middlewares-bootstrappers">Middleware and Bootstrapping</h3>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				Middleware and bootstrapping components can also be created by the scaffolding tool. The generated files
+				have only a very basic template to them by default, as these components are usually fairly basic in
+				structure anyway.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger create middleware &lt;middlewareName>
+			{{/pre}}
+			{{#pre "bash"}}
+				$ dagger create bootstrap &lt;bootstrapperName>
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>middleware/foo.js</h3>
+				{{#pre "javascript"}}
+					exports = module.exports = function(req, next) {
+						// 
+						// Define your middleware functionality here
+						// 
+					};
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>bootstrap/foo.js</h3>
+				{{#pre "javascript"}}
+					exports = module.exports = function() {
+						// 
+						// Do your bootstrapping here
+						// 
+					};
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				For more info about creating and using middlewares and bootstrappers, check out the respective guides
+				<a href="/guides/middleware" data-local="true">Middleware</a> and <a href="/guides/bootstrappers"
+				data-local="true">Bootstrappers</a>, as well as the <a href="/docs">documentation</a>.
+			</p>
+		</div>
+	</div>
+
+
+
+	<h3 id="destroy">Destroying Components</h3>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				All the basic component types (<a href="#models">models</a>, <a href="#endpoints">endpoints</a>,
+				<a href="#middlewares-bootstrappers">middlewares, and bootstrappers</a>) can be destroyed using the CLI
+				as easily as they can be created.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger destroy &lt;componentType> &lt;componentName>
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				The command will prompt you to confirm before deleting anything. To skip the confirmation, you can add a
+				<code>--force</code> flag to the command.
+			</p>
+		</div>
+	</div>
+
+
+
+	<h3 id="templates">Templating</h3>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Each component type (<a href="#models">models</a>, <a href="#endpoints">endpoints</a>, <a
+				href="#middlewares-bootstrappers">middlewares, and bootstrappers</a>) has its own set of templates defined gloabally
+				within the <code>dagger</code> command that are used when generating new components with the <code>dagger create</code>
+				command. The content of these templates can be modified to better suit your own development practices and patterns,
+				or you can even create new templates for different tasks. You can also create templates that are contained locally
+				inside a single project. These templates are <a href="http://handlebarsjs.com/">Handlebars</a> templates containing
+				JavaScript. For example, here is the contents of the base endpoint template.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>template/endpoint/base.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint   = require('dagger.js/lib/endpoint');
+					var HttpError  = require('dagger.js/lib/http-meta').HttpError;
+
+					var \{{ endpointName.class }}Endpoint = module.exports = new Endpoint({
+
+						route: '/\{{ endpointName.hyphen }}',
+						\{{#each methods}}
+						//
+						// \{{upper this}} /\{{ ../endpointName.hyphen }}
+						//
+						"\{{ this }}": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						}\{{#unless @last}},\{{/unless}}
+						\{{/each}}
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				And this template generates endpoint files like this:
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>endpoints/foo.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint   = require('dagger.js/lib/endpoint');
+					var HttpError  = require('dagger.js/lib/http-meta').HttpError;
+
+					var FooEndpoint = module.exports = new Endpoint({
+
+						route: '/foo',
+						
+						//
+						// GET /foo
+						//
+						"get": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// POST /foo
+						//
+						"post": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// PUT|PATCH /foo
+						//
+						"put|patch": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						},
+						
+						//
+						// DELETE /foo
+						//
+						"delete": function(req) {
+							(new HttpError(405, 'Endpoint not configured')).send(req);
+						}
+						
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				By default, <code>dagger</code> ships with a <code>base</code> template for each component type. There is also
+				the <code>model</code> template for endpoints which contains all of the built-in RESTful goodness, as well as
+				a basic <code>uncaught</code> bootstrapper which adds logging of uncaught exceptions.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-6 medium-push-6 columns">
+			<p>
+				You can open up a template for editing with a single, simple command. In this form, it will open the
+				<code>base</code> template for the given component type using your default editor.
+			</p>
+		</div>
+		<div class="small-12 medium-6 medium-pull-6 columns">
+			{{#pre "bash"}}
+				$ dagger config template &lt;componentType>
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				To edit a template other than the base, you can add the <code>--name &lt;templateName></code> option. Creating
+				new templates is also done in this way, you just give a template name that does not exist and a new template
+				file will be created. When you create a new template in this way, you can copy over another existing template
+				into the new file using the <code>--from &lt;templateName></code> option.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				# Create a new endpoint template called "foo", copying from the base template
+				$ dagger config template endpoint --name foo --from base
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				To make a change to a template only effect your current project, or to create a new template in your current
+				project, you can add the <code>--edit-local</code> flag. Local templates are always given precedence when
+				creating new components unless a <code>--use-global</code> flag is given during creation.
+			</p>
+		</div>
+	</div>
+
+	<hr />
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				That concludes the guide about the scaffold CLI. For more specific detail about the individual commands and their
+				options / flags check out the CLI <a href="/docs/cli" data-local="true">documentation</a>.
+			</p>
+		</div>
+	</div>
+</div>

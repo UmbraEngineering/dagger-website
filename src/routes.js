@@ -14,7 +14,7 @@ exports.init = function(app) {
 	});
 
 	app.get('/guides/:page', function(req, res) {
-		res.render('guides/' + req.params.page);
+		res.render('guides/' + req.params.page, data('guide'));
 	});
 
 	app.get('/docs', function(req, res) {

@@ -3262,7 +3262,7 @@ var Router = module.exports = AppObject.extend({
 	// 
 	// Used to bind an anchor to the router, like this:
 	// 
-	//   $('a#foo').on('click', router.handleAnchor);
+	//   $('a[data-local]').on('click', router.handleAnchor);
 	// 
 	// @param {evt} the click event object
 	// @return void
@@ -3274,7 +3274,7 @@ var Router = module.exports = AppObject.extend({
 		while (target.tagName !== 'A' && target !== document.body) {
 			target = target.parentNode;
 		}
-		
+
 		var href = target.getAttribute('href');
 		while (href.charAt(0) === '/' || href.charAt(0) === '#') {
 			href = href.slice(1);

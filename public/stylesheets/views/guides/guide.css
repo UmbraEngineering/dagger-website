@@ -1,0 +1,15 @@
+
+section.guide {
+	/**/
+}
+
+	@media only screen and (min-width:40.063em) {
+		/* Only override these margins if we are not on a small screen */
+		section.guide .row.content {
+			margin-top: 0;
+		}
+
+			section.guide h2 {
+				margin-top: 0;
+			}
+	}

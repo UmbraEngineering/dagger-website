@@ -17,7 +17,7 @@
 html, body {
 	margin: 0;
 	padding: 0;
-	height: 100%;
+	height: 100% !important;
 }
 
 	#wrapper {
@@ -34,21 +34,6 @@ html, body {
 
 	.row.content {
 		margin: 5rem auto;
-	}
-
-div.file {
-	margin: 2rem 0;
-	padding: 1em 1em 0;
-	border: 1px #e5e5e5 solid;
-	border-radius: 10px;
-	background: #f5f5f5;
-}
-	
-	div.file h3 {
-		font-size: 1rem;
-		padding: 0 0 1em;
-		font-weight: bold;
-		font-family: var(--monospace-font);
 	}
 
 @media only screen and (max-width:90em) {
@@ -144,13 +129,13 @@ div.file {
 	padding: 25px 50px 10rem;
 }
 
-
-	h2 {
+	h2, h3 {
 		margin-top: 5rem;
 		margin-bottom: 1.5rem;
 		position: relative;
 		left: -35px;
-		color: #aaa;
+		color: #999;
+		font-size: 2.5rem;
 	}
 
 	p {
@@ -158,18 +143,68 @@ div.file {
 		font-size: 1.4rem;
 	}
 
+		p code,
+		li code,
+		dt code,
+		dd code,
+		h2 code {
+			margin: 0 2px;
+			padding: 0 5px;
+			background: #def;
+			text-shadow: 1px 0 0 #fff;
+			box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+			position: relative;
+			top: -1px;
+			left: -1px;
+		}
+
 	dl {
 		padding: 15px 35px;
 	}
 
 		dl dt {
-			font-size: 1.2rem;
+			line-height: 1;
+			font-size: 1.3rem;
+			font-weight: normal;
 		}
 
 		dl dd {
 			color: #444;
-			font-size: 1.2rem;
+			font-size: 1.3rem;
 			margin-left: 1rem;
+			margin-bottom: 2rem;
+		}
+
+	ul {
+		padding: 15px 35px;
+	}
+
+		ul li {
+			font-size: 1.2rem;
+		}
+
+	code {
+		font-size: 0.9em;
+		font-weight: normal;
+	}
+
+	div.file {
+		margin: 2rem 0;
+		padding: 1em 1em 0;
+		border: 1px #e5e5e5 solid;
+		border-radius: 10px;
+		background: #f5f5f5;
+	}
+		
+		div.file h3 {
+			font-size: 1rem;
+			padding: 0 0 1em;
+			font-weight: bold;
+			font-family: var(--monospace-font);
+			margin: 5px;
+			position: static;
+			left: 0;
+			color: #666;
 		}
 
 

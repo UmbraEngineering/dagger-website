@@ -6,6 +6,7 @@ var Router               = require('cloak/router');
 
 var HomeView             = require('views/home');
 var GuideListView        = require('views/guides/list');
+var GuideView            = require('views/guides/guide');
 
 // --------------------------------------------------------
 
@@ -23,8 +24,8 @@ var MainRouter = module.exports = Router.extend({
 	initialize: function() {
 		this.$content = $('#content');
 
-		// Handle internal anchors with the router
-		$('#wrapper').on('click', 'a[href^="#"]:not([href="#"]), a[href^="/#"]', this.handleAnchor);
+		// Handle local links with the router
+		$('#wrapper').on('click', 'a[data-local]', this.handleAnchor);
 	},
 
 // --------------------------------------------------------
@@ -49,7 +50,7 @@ var MainRouter = module.exports = Router.extend({
 	// "/guides/:page"
 	// 
 	showGuide: function(params) {
-		// 
+		this.drawPage(GuideView, { guide: params.page });
 	},
 
 // --------------------------------------------------------
@@ -73,12 +74,19 @@ var MainRouter = module.exports = Router.extend({
 	// 
 	// Draws a page with the given page view class
 	// 
-	drawPage: function(PageView, callback) {
+	drawPage: function(PageView, params, callback) {
+		if (typeof params === 'function') {
+			callback = params;
+			params = null;
+		}
+		params = params || { };
+
 		// If this is an initial page load, it will have been rendered server-side, so we need
 		// to pull the content already rendered to initialize the page view
 		if (! this.currentView) {
 			var view = this.currentView = new PageView();
 			view.$elem = this.$content.children('section');
+			_.extend(view, params);
 
 			if (view.afterDraw) {
 				view.afterDraw();
@@ -93,10 +101,9 @@ var MainRouter = module.exports = Router.extend({
 		else {
 			var $content = this.$content;
 			var current = this.currentView;
-			var next = new PageView();
+			var next = this.currentView = new PageView();
+			_.extend(next, params);
 			next.draw();
-
-			this.currentView = next;
 
 			$content.animate({ opacity: 'hide' }, 300, function() {
 				current.remove();
