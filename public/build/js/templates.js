@@ -184,10 +184,46 @@ function program33(depth0,data) {
 this["exports"]["guides.config"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
+
+function program1(depth0,data) {
   
+  
+  return "\n					module.exports = {\n						//\n					};\n				";
+  }
 
+function program3(depth0,data) {
+  
+  
+  return "\n				$ NODE_ENV=development node app.js\n			";
+  }
 
-  return "<div class=\"row content\">\n	<h2>Configuring Your App</h2>\n</div>";
+function program5(depth0,data) {
+  
+  
+  return "\n				module.exports = {\n					\n					foo: {\n						bar: \"some value\"\n					}\n\n				};\n			";
+  }
+
+function program7(depth0,data) {
+  
+  
+  return "\n				var config = require('dagger.js/lib/config');\n\n				// \"some value\"\n				var fooBar = config.foo.bar;\n			";
+  }
+
+  buffer += "<div class=\"row content\">\n	<h2>Configuring Your App</h2>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				When you create a new dagger project, you have a <code>config</code> directory pre-populated with a single file,\n				<code>master.js</code>. This file contains all of the configurable setting for a dagger app with their default\n				values. To use dagger in its simplest form, you can modify the values in this file. However, it will likely be\n				more useful to set up multiple environments for your app to run in. Every file you create in the <code>config</code>\n				directory (other than the <code>master.js</code> file) will automatically create a new environment for your app.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Let's say you want to set up two environments: one for development\n				and one for production. First, you would create two new files in <code>config</code>: <code>development.js</code>\n				and <code>production.js</code>. To start, they should look like this:\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			<div class=\"file\">\n				<h3>config/development.js</h3>\n				";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			</div>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Pretty simple. All environments inherit from the <code>master.js</code> file, so any values that are shared between\n				environments can be defined there without worrying about the individual environment files. All that needs to be in\n				those files are the config values that are specific to that one environment.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-6 medium-push-6 columns\">\n			<p>\n				You can change which environment you app is running in by setting the <code>NODE_ENV</code> environment variable\n				when starting your application.\n			</p>\n		</div>\n		<div class=\"small-12 medium-6 medium-pull-6 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<h3>Custom Config</h3>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				In addition to the built-in dagger configuration values, you can define and reference your own config values as well.\n				For example, let's say you define a value in your config file like this:\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				You can then reference the config value in your application code by loading the dagger config module:\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<hr />\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				That's about all there is to it; Configuration is very simple with dagger so that you can just get to work and not have\n				to fuss with setting up environments. For more info on the individual configuration values that go in your files, you\n				can look at the <a href=\"/docs/config\">configuration docs</a>.\n			</p>\n		</div>\n	</div>\n</div>";
+  return buffer;
   });
 
 this["exports"]["guides.endpoints"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
