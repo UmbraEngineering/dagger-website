@@ -291,6 +291,18 @@ function program19(depth0,data) {
   return "\n					var Endpoint = require('dagger.js/lib/endpoint');\n\n					var FooEndpoint = module.exports = new Endpoint({\n\n						route: '/foo',\n\n						//\n						// PUT /foo/:id\n						// PATCH /foo/:id\n						//\n						'put|patch /:id': function(req) {\n							req.respond(200, {\n								message: \"The request was made with the \" + req.method + \" method\"\n							});\n						}\n\n					});\n				";
   }
 
+function program21(depth0,data) {
+  
+  
+  return "\n				$ dagger create endpoint people for person\n			";
+  }
+
+function program23(depth0,data) {
+  
+  
+  return "\n				var req = {\n					method: 'get',\n					url: '/foo'\n				};\n\n				socket.emit('request', req, function(res) {\n					// \"Hello, World!\"\n					console.log(res.body.message);\n				});\n			";
+  }
+
   buffer += "<div class=\"row content\">\n	<h2>Endpoints</h2>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				This guide is all about endpoints. Endpoints can be created using the <code>dagger create</code>\n				command.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
   stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
@@ -321,7 +333,19 @@ function program19(depth0,data) {
   buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				You can also handle multiple HTTP verbs with a single function. A common example of this is handling\n				<code>PUT</code> and <code>PATCH</code> requests in the same way. This is done by defining a list of\n				verbs separated by pipe (<code>|</code>) characters.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			<div class=\"file\">\n				<h3>endpoints/foo.js</h3>\n				";
   stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(19, program19, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
   if(stack1 || stack1 === 0) { buffer += stack1; }
-  buffer += "\n			</div>\n		</div>\n	</div>\n</div>";
+  buffer += "\n			</div>\n		</div>\n	</div>\n\n\n\n	<h3 id=\"models\">Model Endpoints</h3>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				You can use the scaffolding CLI to create an endpoint that is pre-built for basic RESTful operations. The\n				following command generates an endpoint <code>/people</code> that handles all the standard <abbr\n				title=\"Create, Read, Update, Destroy\">CRUD</abbr> tasks for the model <code>person</code>.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(21, program21, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				For more info about model endpoints, take a look at the <a href=\"/guides/cli\">scaffolding guide</a> and\n				<a href=\"/docs/cli\">documentation</a>.\n			</p>\n		</div>\n	</div>\n\n\n\n	<h3 id=\"sockets\">Endpoints and Websockets</h3>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				If you enable socket.io in your application config, you can use websockets to perform some extra tasks that\n				couldn't be very easily accomplished without them. For example, you can use your websocket connection to listen\n				for documents being created, edited, or destroyed in the database and immediately inform the client. However,\n				another thing you can do with socket.io is make standard API calls. <em>Any request that you can make with\n				HTTP in dagger can also be made using a websocket.</em> Applications that make a large volume of API calls\n				may find that keeping a single socket connection open is much more efficient than opening a new HTTP request\n				for every API call needed.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Looking at the example endpoint above, before we made a request to the endpoint with an HTTP request like this:\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data},helper ? helper.call(depth0, "http", options) : helperMissing.call(depth0, "pre", "http", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data},helper ? helper.call(depth0, "http", options) : helperMissing.call(depth0, "pre", "http", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				With websockets enabled in your application, that same request could be made using socket.io like this:\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(23, program23, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				For more info about using the websocket functionality in dagger, check out the <a href=\"/guides/websockets\"\n				>websockets guide</a>.\n			</p>\n		</div>\n	</div>\n\n	<hr />\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				That covers all of the basics of endpoints; For more information you can look at the <a href=\"/docs/endpoint\"\n				>endpoint documentation</a>.\n			</p>\n		</div>\n	</div>\n</div>";
   return buffer;
   });
 

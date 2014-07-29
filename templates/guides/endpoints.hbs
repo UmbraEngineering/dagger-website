@@ -251,4 +251,121 @@
 			</div>
 		</div>
 	</div>
+
+
+
+	<h3 id="models">Model Endpoints</h3>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				You can use the scaffolding CLI to create an endpoint that is pre-built for basic RESTful operations. The
+				following command generates an endpoint <code>/people</code> that handles all the standard <abbr
+				title="Create, Read, Update, Destroy">CRUD</abbr> tasks for the model <code>person</code>.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				$ dagger create endpoint people for person
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				For more info about model endpoints, take a look at the <a href="/guides/cli">scaffolding guide</a> and
+				<a href="/docs/cli">documentation</a>.
+			</p>
+		</div>
+	</div>
+
+
+
+	<h3 id="sockets">Endpoints and Websockets</h3>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				If you enable socket.io in your application config, you can use websockets to perform some extra tasks that
+				couldn't be very easily accomplished without them. For example, you can use your websocket connection to listen
+				for documents being created, edited, or destroyed in the database and immediately inform the client. However,
+				another thing you can do with socket.io is make standard API calls. <em>Any request that you can make with
+				HTTP in dagger can also be made using a websocket.</em> Applications that make a large volume of API calls
+				may find that keeping a single socket connection open is much more efficient than opening a new HTTP request
+				for every API call needed.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Looking at the example endpoint above, before we made a request to the endpoint with an HTTP request like this:
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "http"}}
+				GET http://example.com/foo HTTP/1.1
+			{{/pre}}
+			{{#pre "http"}}
+				HTTP/1.1 200 OK
+				Content-Type: application/json
+
+				{
+					"message": "Hello, World!"
+				}
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				With websockets enabled in your application, that same request could be made using socket.io like this:
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "javascript"}}
+				var req = {
+					method: 'get',
+					url: '/foo'
+				};
+
+				socket.emit('request', req, function(res) {
+					// "Hello, World!"
+					console.log(res.body.message);
+				});
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				For more info about using the websocket functionality in dagger, check out the <a href="/guides/websockets"
+				>websockets guide</a>.
+			</p>
+		</div>
+	</div>
+
+	<hr />
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				That covers all of the basics of endpoints; For more information you can look at the <a href="/docs/endpoint"
+				>endpoint documentation</a>.
+			</p>
+		</div>
+	</div>
 </div>
