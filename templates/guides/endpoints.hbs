@@ -1,3 +1,254 @@
 <div class="row content">
 	<h2>Endpoints</h2>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				This guide is all about endpoints. Endpoints can be created using the <code>dagger create</code>
+				command.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "bash"}}
+				$ dagger create endpoint foo
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Inside the file, a dagger endpoint is an instance of the <code>Endpoint</code> class. This instance is given
+				a <code>route</code> value which is the base URI that the endpoint responds to.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>endpoints/foo.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint = require('dagger.js/lib/endpoint');
+
+					var FooEndpoint = module.exports = new Endpoint({
+
+						route: '/foo'
+
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				From there, you can define functions for handling different verbs and subroutes.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>endpoints/foo.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint = require('dagger.js/lib/endpoint');
+
+					var FooEndpoint = module.exports = new Endpoint({
+
+						route: '/foo',
+
+						'get': function(req) {
+							// 
+							// GET /foo
+							//
+						},
+
+						'post /bar': function(req) {
+							//
+							// POST /foo/bar
+							//
+						},
+
+						'put /:id': function(req) {
+							//
+							// PUT /foo/...
+							//
+						}
+
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Each of your endpoint methods recieves a single argument when a request comes in which is a normalized
+				request/response handler. This normalization is important due to the way that dagger can pass requests into
+				your endpoints from both HTTP and Websockets. More about the <code>Request</code> class can be found in
+				the <a href="/docs">documentation</a>.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Let's create a basic endpoint that serves a JSON blob with a message.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>endpoints/foo.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint = require('dagger.js/lib/endpoint');
+
+					var FooEndpoint = module.exports = new Endpoint({
+
+						route: '/foo',
+
+						//
+						// GET /foo
+						//
+						'get': function(req) {
+							req.respond(200, {
+								message: 'Hello, World!'
+							});
+						}
+
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				With the endpoint defined, you can make a request to the endpoint to try it out.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "http"}}
+				GET http://example.com/foo HTTP/1.1
+			{{/pre}}
+			{{#pre "http"}}
+				HTTP/1.1 200 OK
+				Content-Type: application/json
+
+				{
+					"message": "Hello, World!"
+				}
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				Now, let's get a little fancier. We can modify the endpoint method to take a URI parameter.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>endpoints/foo.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint = require('dagger.js/lib/endpoint');
+
+					var FooEndpoint = module.exports = new Endpoint({
+
+						route: '/foo',
+
+						//
+						// GET /foo/:id
+						//
+						'get /:id': function(req) {
+							req.respond(200, {
+								message: "You gave the parameter '" + req.params.id + "'"
+							});
+						}
+
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				When we make our test request this time, we give a URI parameter to match the new route, and the endpoint
+				gives it right back.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			{{#pre "http"}}
+				GET http://example.com/foo/bar HTTP/1.1
+			{{/pre}}
+			{{#pre "http"}}
+				HTTP/1.1 200 OK
+				Content-Type: application/json
+
+				{
+					"message": "You gave the parameter 'bar'"
+				}
+			{{/pre}}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 columns">
+			<p>
+				You can also handle multiple HTTP verbs with a single function. A common example of this is handling
+				<code>PUT</code> and <code>PATCH</code> requests in the same way. This is done by defining a list of
+				verbs separated by pipe (<code>|</code>) characters.
+			</p>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="small-12 medium-10 medium-offset-1 columns">
+			<div class="file">
+				<h3>endpoints/foo.js</h3>
+				{{#pre "javascript"}}
+					var Endpoint = require('dagger.js/lib/endpoint');
+
+					var FooEndpoint = module.exports = new Endpoint({
+
+						route: '/foo',
+
+						//
+						// PUT /foo/:id
+						// PATCH /foo/:id
+						//
+						'put|patch /:id': function(req) {
+							req.respond(200, {
+								message: "The request was made with the " + req.method + " method"
+							});
+						}
+
+					});
+				{{/pre}}
+			</div>
+		</div>
+	</div>
 </div>

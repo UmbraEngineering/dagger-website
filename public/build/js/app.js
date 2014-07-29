@@ -229,10 +229,100 @@ function program7(depth0,data) {
 this["exports"]["guides.endpoints"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
+  var buffer = "", stack1, helper, options, self=this, helperMissing=helpers.helperMissing;
+
+function program1(depth0,data) {
   
+  
+  return "\n				$ dagger create endpoint foo\n			";
+  }
 
+function program3(depth0,data) {
+  
+  
+  return "\n					var Endpoint = require('dagger.js/lib/endpoint');\n\n					var FooEndpoint = module.exports = new Endpoint({\n\n						route: '/foo'\n\n					});\n				";
+  }
 
-  return "<div class=\"row content\">\n	<h2>Endpoints</h2>\n</div>";
+function program5(depth0,data) {
+  
+  
+  return "\n					var Endpoint = require('dagger.js/lib/endpoint');\n\n					var FooEndpoint = module.exports = new Endpoint({\n\n						route: '/foo',\n\n						'get': function(req) {\n							// \n							// GET /foo\n							//\n						},\n\n						'post /bar': function(req) {\n							//\n							// POST /foo/bar\n							//\n						},\n\n						'put /:id': function(req) {\n							//\n							// PUT /foo/...\n							//\n						}\n\n					});\n				";
+  }
+
+function program7(depth0,data) {
+  
+  
+  return "\n					var Endpoint = require('dagger.js/lib/endpoint');\n\n					var FooEndpoint = module.exports = new Endpoint({\n\n						route: '/foo',\n\n						//\n						// GET /foo\n						//\n						'get': function(req) {\n							req.respond(200, {\n								message: 'Hello, World!'\n							});\n						}\n\n					});\n				";
+  }
+
+function program9(depth0,data) {
+  
+  
+  return "\n				GET http://example.com/foo HTTP/1.1\n			";
+  }
+
+function program11(depth0,data) {
+  
+  
+  return "\n				HTTP/1.1 200 OK\n				Content-Type: application/json\n\n				{\n					\"message\": \"Hello, World!\"\n				}\n			";
+  }
+
+function program13(depth0,data) {
+  
+  
+  return "\n					var Endpoint = require('dagger.js/lib/endpoint');\n\n					var FooEndpoint = module.exports = new Endpoint({\n\n						route: '/foo',\n\n						//\n						// GET /foo/:id\n						//\n						'get /:id': function(req) {\n							req.respond(200, {\n								message: \"You gave the parameter '\" + req.params.id + \"'\"\n							});\n						}\n\n					});\n				";
+  }
+
+function program15(depth0,data) {
+  
+  
+  return "\n				GET http://example.com/foo/bar HTTP/1.1\n			";
+  }
+
+function program17(depth0,data) {
+  
+  
+  return "\n				HTTP/1.1 200 OK\n				Content-Type: application/json\n\n				{\n					\"message\": \"You gave the parameter 'bar'\"\n				}\n			";
+  }
+
+function program19(depth0,data) {
+  
+  
+  return "\n					var Endpoint = require('dagger.js/lib/endpoint');\n\n					var FooEndpoint = module.exports = new Endpoint({\n\n						route: '/foo',\n\n						//\n						// PUT /foo/:id\n						// PATCH /foo/:id\n						//\n						'put|patch /:id': function(req) {\n							req.respond(200, {\n								message: \"The request was made with the \" + req.method + \" method\"\n							});\n						}\n\n					});\n				";
+  }
+
+  buffer += "<div class=\"row content\">\n	<h2>Endpoints</h2>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				This guide is all about endpoints. Endpoints can be created using the <code>dagger create</code>\n				command.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(1, program1, data),data:data},helper ? helper.call(depth0, "bash", options) : helperMissing.call(depth0, "pre", "bash", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Inside the file, a dagger endpoint is an instance of the <code>Endpoint</code> class. This instance is given\n				a <code>route</code> value which is the base URI that the endpoint responds to.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			<div class=\"file\">\n				<h3>endpoints/foo.js</h3>\n				";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(3, program3, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			</div>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				From there, you can define functions for handling different verbs and subroutes.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			<div class=\"file\">\n				<h3>endpoints/foo.js</h3>\n				";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(5, program5, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			</div>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Each of your endpoint methods recieves a single argument when a request comes in which is a normalized\n				request/response handler. This normalization is important due to the way that dagger can pass requests into\n				your endpoints from both HTTP and Websockets. More about the <code>Request</code> class can be found in\n				the <a href=\"/docs\">documentation</a>.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Let's create a basic endpoint that serves a JSON blob with a message.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			<div class=\"file\">\n				<h3>endpoints/foo.js</h3>\n				";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(7, program7, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			</div>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				With the endpoint defined, you can make a request to the endpoint to try it out.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(9, program9, data),data:data},helper ? helper.call(depth0, "http", options) : helperMissing.call(depth0, "pre", "http", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(11, program11, data),data:data},helper ? helper.call(depth0, "http", options) : helperMissing.call(depth0, "pre", "http", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				Now, let's get a little fancier. We can modify the endpoint method to take a URI parameter.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			<div class=\"file\">\n				<h3>endpoints/foo.js</h3>\n				";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(13, program13, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			</div>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				When we make our test request this time, we give a URI parameter to match the new route, and the endpoint\n				gives it right back.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(15, program15, data),data:data},helper ? helper.call(depth0, "http", options) : helperMissing.call(depth0, "pre", "http", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(17, program17, data),data:data},helper ? helper.call(depth0, "http", options) : helperMissing.call(depth0, "pre", "http", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 columns\">\n			<p>\n				You can also handle multiple HTTP verbs with a single function. A common example of this is handling\n				<code>PUT</code> and <code>PATCH</code> requests in the same way. This is done by defining a list of\n				verbs separated by pipe (<code>|</code>) characters.\n			</p>\n		</div>\n	</div>\n\n	<div class=\"row\">\n		<div class=\"small-12 medium-10 medium-offset-1 columns\">\n			<div class=\"file\">\n				<h3>endpoints/foo.js</h3>\n				";
+  stack1 = (helper = helpers.pre || (depth0 && depth0.pre),options={hash:{},inverse:self.noop,fn:self.program(19, program19, data),data:data},helper ? helper.call(depth0, "javascript", options) : helperMissing.call(depth0, "pre", "javascript", options));
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "\n			</div>\n		</div>\n	</div>\n</div>";
+  return buffer;
   });
 
 this["exports"]["guides.list"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
